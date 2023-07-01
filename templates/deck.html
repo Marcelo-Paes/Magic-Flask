@@ -16,47 +16,12 @@
             display: inline-block;
         }
 
-        .loader {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            font-size: 20px;
-            font-weight: bold;
-            text-align: center;
-        }
-   
-        .loader p {
-            margin-bottom: 20px;
-            font-size: 20px;
-            font-weight: bold;
-            text-align: center;
-            position: absolute;
-            top: 10%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-
         .deck-content {
-            display: none;
+            display: block;
         }
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            var loader = document.getElementById('loader');
-            var deckContent = document.getElementById('deckContent');
-
-            function showDeckContent() {
-                loader.style.display = 'none';
-                deckContent.style.display = 'block';
-            }
-
-            setTimeout(showDeckContent, 2000); // Simulação de tempo de carregamento (2 segundos)
-
-            // Se quiser utilizar um evento de carregamento real, substitua a função setTimeout por:
-            // window.addEventListener('load', showDeckContent);
-
             var cardNames = document.getElementsByClassName('card-name');
             var cardImages = document.getElementsByClassName('card-image');
             var decreaseButtons = document.getElementsByClassName('quantity-decrease');
@@ -120,11 +85,6 @@
     </script>
 </head>
 <body>
-    <div id="loader" class="loader">
-        <p>Carregando Deck, Aguarde...</p>
-        <img src="https://i.gifer.com/XOsX.gif" alt="Loading">
-    </div>
-
     <div id="deckContent" class="deck-content">
         <h1>Deck Info</h1>
         <h2>{{ deck_name }}</h2>
