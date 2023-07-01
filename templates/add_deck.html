@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Adicionar Deck</title>
+    <style>
+        .loader {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgb(255, 255, 255);
+            z-index: 9999;
+            background-image: url('https://i.gifer.com/XOsX.gif');
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+   
+        .loader p {
+            margin-bottom: 20px;
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+            position: absolute;
+            top: 10%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+    </style>
+</head>
+<body>
+    <h1>Adicionar Deck</h1>
+
+    <form method="POST" action="/add_deck" enctype="multipart/form-data" onsubmit="showLoader()">
+        <label for="deck_name">Nome do Deck:</label>
+        <input type="text" name="deck_name" id="deck_name" required>
+        
+        <label for="deck_list">Lista de Cartas:</label>
+        <textarea name="deck_list" id="deck_list" required></textarea>
+        
+        <label for="file_input">Arquivo de Texto:</label>
+        <input type="file" name="file_input" id="file_input">
+        
+        <button type="submit" onclick="showLoader()">Adicionar Deck</button>
+    </form>
+
+    <div id="loader" class="loader">
+        <p>Carregando Deck, Aguarde...</p>
+        
+    </div>
+
+    <script>
+        function showLoader() {
+            var loader = document.getElementById('loader');
+            loader.style.display = 'flex';
+        }
+
+        document.getElementById('file_input').addEventListener('change', function(e) {
+            var file = e.target.files[0];
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var fileContent = e.target.result;
+                document.getElementById('deck_list').value += fileContent;
+            };
+            reader.readAsText(file);
+        });
+    </script>
+</body>
+</html>

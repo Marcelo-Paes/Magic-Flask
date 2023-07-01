@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Deck Info</title>
+    <style>
+        .card-image {
+            display: none;
+            position: absolute;
+            z-index: 2;
+            width: 300px; /* Defina a largura desejada */
+            height: auto; /* Mantenha a proporção original */
+        }
+
+        .card-name {
+            position: relative;
+            display: inline-block;
+        }
+
+        .loader {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+        }
+   
+        .loader p {
+            margin-bottom: 20px;
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+            position: absolute;
+            top: 10%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .deck-content {
+            display: none;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var loader = document.getElementById('loader');
+            var deckContent = document.getElementById('deckContent');
+
+            function showDeckContent() {
+                loader.style.display = 'none';
+                deckContent.style.display = 'block';
+            }
+
+            setTimeout(showDeckContent, 2000); // Simulação de tempo de carregamento (2 segundos)
+
+            // Se quiser utilizar um evento de carregamento real, substitua a função setTimeout por:
+            // window.addEventListener('load', showDeckContent);
+
+            var cardNames = document.getElementsByClassName('card-name');
+            var cardImages = document.getElementsByClassName('card-image');
+            var decreaseButtons = document.getElementsByClassName('quantity-decrease');
+            var increaseButtons = document.getElementsByClassName('quantity-increase');
+            var quantityElements = document.getElementsByClassName('quantity');
+            var totalPriceElement = document.getElementById('total-price');
+            var cardPrices = document.getElementsByClassName('card-price');
+
+            function updateTotalPrice() {
+                var totalPrice = 0;
+
+                for (var i = 0; i < quantityElements.length; i++) {
+                    var price = parseFloat(cardPrices[i].getAttribute('data-price'));
+                    var quantity = parseInt(quantityElements[i].textContent);
+                    var subtotal = price * quantity;
+                    totalPrice += subtotal;
+                    cardPrices[i].textContent = subtotal.toFixed(2);
+                }
+
+                totalPriceElement.textContent = totalPrice.toFixed(2);
+            }
+
+            for (var i = 0; i < cardNames.length; i++) {
+                (function(index) {
+                    cardNames[index].addEventListener('mousemove', function(e) {
+                        cardImages[index].style.left = e.clientX + 'px';
+                    });
+
+                    cardNames[index].addEventListener('mouseenter', function() {
+                        cardImages[index].style.display = 'block';
+                    });
+
+                    cardNames[index].addEventListener('mouseleave', function() {
+                        cardImages[index].style.display = 'none';
+                    });
+
+                    decreaseButtons[index].addEventListener('click', function() {
+                        var quantityElement = quantityElements[index];
+                        var quantity = parseInt(quantityElement.textContent);
+
+                        if (quantity > 1) {
+                            quantity--;
+                            quantityElement.textContent = quantity;
+                            updateTotalPrice();
+                        }
+                    });
+
+                    increaseButtons[index].addEventListener('click', function() {
+                        var quantityElement = quantityElements[index];
+                        var quantity = parseInt(quantityElement.textContent);
+
+                        quantity++;
+                        quantityElement.textContent = quantity;
+                        updateTotalPrice();
+                    });
+                })(i);
+            }
+
+            updateTotalPrice();
+        });
+    </script>
+</head>
+<body>
+    <div id="loader" class="loader">
+        <p>Carregando Deck, Aguarde...</p>
+        <img src="https://i.gifer.com/XOsX.gif" alt="Loading">
+    </div>
+
+    <div id="deckContent" class="deck-content">
+        <h1>Deck Info</h1>
+        <h2>{{ deck_name }}</h2>
+        <h3>Deck List:</h3>
+
+        {% for card in deck_list %}
+        <div>
+            <button class="quantity-decrease">-</button>
+            <span class="quantity">1</span>
+            <button class="quantity-increase">+</button>
+            <span class="card-name" title="{{ card.name }}">{{ card.name }}</span>
+            <span class="card-price" data-price="{{ card.price_brl }}"> - R$ <span>{{ card.price_brl }}</span></span><br>
+            <img class="card-image" src="{{ card.image }}" alt="{{ card.name }}"><br>
+        </div>
+        {% endfor %}
+
+        <p>Total do Deck List: R$ <span id="total-price"></span></p>
+    </div>
+</body>
+</html>

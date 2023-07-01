@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Search Result</title>
+</head>
+<body>
+    
+    <h1>Search Result</h1>
+    <form action="/search" method="POST">
+        <label for="card_name">New Card Name:</label>
+        <input type="text" id="card_name" name="card_name" required>
+        <button type="submit">Search</button>
+    </form>
+    <h2>{{ card_name }}</h2>
+    <img src="{{ card_image }}" alt="{{ card_name }}">
+    <h3>Formats:</h3>
+    <ul>
+    {% for format in card_formats %}
+    <li>{{ format }}</li>
+    {% endfor %}
+    </ul>
+    <p>{{ card_description }}</p>
+    <p>Price: {{ card_price_brl }} BRL</p>
+    
+</body>
+</html>
