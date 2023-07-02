@@ -51,12 +51,17 @@ def add_deck():
             if file.filename.endswith('.txt'):
                 card_names = file.read().decode('utf-8').splitlines()
                 card_names = [card.strip() for card in card_names if card.strip()]
+                deck_list += '\n' + '\n'.join(card_names)
 
         card_names = [card.strip() for card in deck_list.split('\n') if card.strip()]  # Assume que as cartas estão separadas por linhas
         
         cards = []
+        card_requests = []
         for card_name in card_names:
-            response = requests.get(f'https://api.scryfall.com/cards/named?exact={card_name.strip().replace(" ", "+")}')
+            card_requests.append(f'https://api.scryfall.com/cards/named?exact={card_name.strip().replace(" ", "+")}')
+        
+        responses = [requests.get(url) for url in card_requests]
+        for response in responses:
             card_data = json.loads(response.text)
             card_image = card_data.get('image_uris', {}).get('normal')
             if card_image:
