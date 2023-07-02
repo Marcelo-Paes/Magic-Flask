@@ -2,9 +2,13 @@ from flask import Flask, render_template, request
 import requests
 import json
 import os
+from cachetools import TTLCache
 
 os.environ['EXCHANGERATE_API_KEY'] = 'sua_chave_de_api'
 app = Flask(__name__)
+
+# Cache com tempo de vida de 1 hora (3600 segundos)
+cache = TTLCache(maxsize=1000, ttl=3600)
 
 @app.route('/')
 def index():
@@ -13,13 +17,22 @@ def index():
 @app.route('/search', methods=['POST'])
 def search():
     card_name = request.form['card_name']
-    response = requests.get(f'https://api.scryfall.com/cards/named?exact={card_name.strip().replace(" ", "+")}')
-    card_data = json.loads(response.text)
+
+    # Verificar se a resposta está em cache
+    if card_name in cache:
+        card_data = cache[card_name]
+    else:
+        response = requests.get(f'https://api.scryfall.com/cards/named?fuzzy={card_name}')
+        card_data = json.loads(response.text)
+        # Armazenar a resposta em cache
+        cache[card_name] = card_data
+
     card_image = card_data['image_uris']['normal']
     card_description = card_data['oracle_text']
     card_price_usd = card_data['prices']['usd']
     card_price_brl = convert_to_brl(card_price_usd)
     return render_template('result.html', card_name=card_name, card_image=card_image, card_description=card_description, card_price_brl=card_price_brl)
+
 
 
 @app.route('/result')
