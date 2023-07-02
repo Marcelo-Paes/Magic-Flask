@@ -13,7 +13,7 @@ def index():
 @app.route('/search', methods=['POST'])
 def search():
     card_name = request.form['card_name']
-    response = requests.get(f'https://api.scryfall.com/cards/named?fuzzy={card_name}')
+    response = requests.get(f'https://api.scryfall.com/cards/named?exact={card_name.strip().replace(" ", "+")}')
     card_data = json.loads(response.text)
     card_image = card_data['image_uris']['normal']
     card_description = card_data['oracle_text']
@@ -25,7 +25,7 @@ def search():
 @app.route('/result')
 def result():
     card_name = request.args.get('card_name')
-    response = requests.get(f'https://api.scryfall.com/cards/named?fuzzy={card_name}')
+    response = requests.get(f'https://api.scryfall.com/cards/named?exact={card_name.strip().replace(" ", "+")}')
     card_data = json.loads(response.text)
     card_image = card_data['image_uris']['normal']
     card_description = card_data['oracle_text']
@@ -52,11 +52,11 @@ def add_deck():
                 card_names = file.read().decode('utf-8').splitlines()
                 card_names = [card.strip() for card in card_names if card.strip()]
 
-        card_names = [card.strip() for card in card_names]  # Assume que as cartas estão separadas por linhas
+        card_names = [card.strip() for card in deck_list.split('\n') if card.strip()]  # Assume que as cartas estão separadas por linhas
         
         cards = []
         for card_name in card_names:
-            response = requests.get(f'https://api.scryfall.com/cards/named?fuzzy={card_name.strip()}')
+            response = requests.get(f'https://api.scryfall.com/cards/named?exact={card_name.strip().replace(" ", "+")}')
             card_data = json.loads(response.text)
             card_image = card_data.get('image_uris', {}).get('normal')
             if card_image:
