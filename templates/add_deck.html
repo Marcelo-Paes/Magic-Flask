@@ -1,8 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <title>Adicionar Deck</title>
     <style>
+        body {
+          background-image: url('https://rare-gallery.com/thumbs/4548984-magic-the-gathering-elesh-norn-phyrexia.jpg');
+          background-repeat: no-repeat;
+          background-size: cover;
+        }
         .loader {
             display: none;
             position: fixed;
@@ -12,7 +18,7 @@
             height: 100%;
             background-color: rgb(255, 255, 255);
             z-index: 9999;
-            background-image: url('https://i.gifer.com/XOsX.gif');
+            background-image: url('https://cdnb.artstation.com/p/assets/images/images/053/863/481/original/erin-loelius-sticker-gif-hbg-tasha-brb-512.gif?1663190882');
             background-repeat: no-repeat;
             background-position: center;
         }
@@ -27,23 +33,106 @@
             left: 50%;
             transform: translate(-50%, -50%);
         }
+        nav {
+          background-color: #f1f1f1;
+        }
+
+        nav ul {
+          list-style-type: none;
+          margin: 0;
+          padding: 0;
+          display: flex;
+        }
+
+        nav li {
+          margin-right: 10px;
+        }
+
+        nav li a {
+          display: block;
+          padding: 10px 20px;
+          text-decoration: none;
+          color: #333;
+        }
+
+        nav li a:hover {
+          background-color: #ddd;
+        }
+        .container {
+            margin-top:90px;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .container h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .container form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container label {
+            margin-bottom: 10px;
+        }
+
+        .container input[type="text"],
+        .container textarea {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .container input[type="file"] {
+            margin-bottom: 10px;
+        }
+
+        .container button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .container button:hover {
+            background-color: #45a049;
+        }
+        .container textarea {
+            height: 400px;} /* Defina a altura desejada */
     </style>
 </head>
 <body>
-    <h1>Adicionar Deck</h1>
+    <nav>
+        <ul>
+          <li><a href="/">Index</a></li>
+          <li><a href="add_deck">Add Deck</a></li>
+        </ul>
+      </nav>
 
-    <form method="POST" action="/add_deck" enctype="multipart/form-data" onsubmit="showLoader()">
-        <label for="deck_name">Nome do Deck:</label>
-        <input type="text" name="deck_name" id="deck_name" required>
-        
-        <label for="deck_list">Lista de Cartas:</label>
-        <textarea name="deck_list" id="deck_list" required></textarea>
-        
-        <label for="file_input">Arquivo de Texto:</label>
-        <input type="file" name="file_input" id="file_input">
-        
-        <button type="submit" onclick="showLoader()">Adicionar Deck</button>
-    </form>
+    <div class="container">
+      <h1>Adicionar Deck</h1>
+
+      <form method="POST" action="/add_deck" enctype="multipart/form-data" onsubmit="showLoader()">
+          <label for="deck_name">Nome do Deck:</label>
+          <input type="text" name="deck_name" id="deck_name" required>
+          
+          <label for="deck_list">Lista de Cartas:</label>
+          <textarea name="deck_list" id="deck_list" required></textarea>
+          
+          <label for="file_input">Arquivo de Texto:</label>
+          <input type="file" name="file_input" id="file_input">
+          
+          <button type="submit">Adicionar Deck</button>
+      </form>
+     </div>
 
     <div id="loader" class="loader">
         <p>Carregando Deck, Aguarde...</p>

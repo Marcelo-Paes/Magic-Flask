@@ -2,7 +2,13 @@
 <html>
 <head>
     <title>Deck Info</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <style>
+         body {
+          background-image: url('https://rare-gallery.com/thumbs/4548984-magic-the-gathering-elesh-norn-phyrexia.jpg');
+          background-repeat: no-repeat;
+          background-size: cover;
+        }
         .card-image {
             display: none;
             position: absolute;
@@ -18,6 +24,31 @@
 
         .deck-content {
             display: block;
+        }
+        nav {
+          background-color: #f1f1f1;
+        }
+
+        nav ul {
+          list-style-type: none;
+          margin: 0;
+          padding: 0;
+          display: flex;
+        }
+
+        nav li {
+          margin-right: 10px;
+        }
+
+        nav li a {
+          display: block;
+          padding: 10px 20px;
+          text-decoration: none;
+          color: #333;
+        }
+
+        nav li a:hover {
+          background-color: #ddd;
         }
     </style>
     <script>
@@ -85,6 +116,12 @@
     </script>
 </head>
 <body>
+    <nav>
+        <ul>
+          <li><a href="/">Index</a></li>
+          <li><a href="add_deck">Add Deck</a></li>
+        </ul>
+      </nav>
     <div id="deckContent" class="deck-content">
         <h1>Deck Info</h1>
         <h2>{{ deck_name }}</h2>
