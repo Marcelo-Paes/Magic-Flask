@@ -10,12 +10,13 @@
           background-size: cover;
         }
         .card-image {
-            display: none;
-            position: absolute;
-            z-index: 2;
-            width: 300px; /* Defina a largura desejada */
-            height: auto; /* Mantenha a proporção original */
-        }
+        position: absolute;
+        display: none;
+        pointer-events: none;
+        z-index: 999;
+        width: auto; /* Defina a largura desejada */
+        height: 400px; /* Defina a altura desejada */
+}
 
         .card-name {
             position: relative;
@@ -53,66 +54,96 @@
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            var cardNames = document.getElementsByClassName('card-name');
-            var cardImages = document.getElementsByClassName('card-image');
-            var decreaseButtons = document.getElementsByClassName('quantity-decrease');
-            var increaseButtons = document.getElementsByClassName('quantity-increase');
-            var quantityElements = document.getElementsByClassName('quantity');
-            var totalPriceElement = document.getElementById('total-price');
-            var cardPrices = document.getElementsByClassName('card-price');
+    var cardNames = document.getElementsByClassName('card-name');
+    var cardImages = document.getElementsByClassName('card-image');
+    var decreaseButtons = document.getElementsByClassName('quantity-decrease');
+    var increaseButtons = document.getElementsByClassName('quantity-increase');
+    var quantityElements = document.getElementsByClassName('quantity');
+    var totalPriceElement = document.getElementById('total-price');
+    var cardPrices = document.getElementsByClassName('card-price');
 
-            function updateTotalPrice() {
-                var totalPrice = 0;
+    function updateTotalPrice() {
+        var totalPrice = 0;
 
-                for (var i = 0; i < quantityElements.length; i++) {
-                    var price = parseFloat(cardPrices[i].getAttribute('data-price'));
-                    var quantity = parseInt(quantityElements[i].textContent);
-                    var subtotal = price * quantity;
-                    totalPrice += subtotal;
-                    cardPrices[i].textContent = subtotal.toFixed(2);
+        for (var i = 0; i < quantityElements.length; i++) {
+            var price = parseFloat(cardPrices[i].getAttribute('data-price'));
+            var quantity = parseInt(quantityElements[i].textContent);
+            var subtotal = price * quantity;
+            totalPrice += subtotal;
+            cardPrices[i].textContent = subtotal.toFixed(2);
+        }
+
+        totalPriceElement.textContent = totalPrice.toFixed(2);
+    }
+
+    function positionCardImage(e, index) {
+  var cursorX = e.clientX;
+  var cursorY = e.clientY;
+  var cardImage = cardImages[index];
+
+  var cardWidth = cardImage.offsetWidth;
+  var cardHeight = cardImage.offsetHeight;
+
+  var windowWidth = window.innerWidth;
+  var windowHeight = window.innerHeight;
+
+  var left = cursorX + (-10);
+  var top = cursorY + (-10);
+
+  // Verificar limite direito da janela
+  if (left + cardWidth > windowWidth) {
+    left = windowWidth - cardWidth;
+  }
+
+  // Verificar limite inferior da janela
+  if (top + cardHeight > windowHeight) {
+    top = windowHeight - cardHeight;
+  }
+
+  cardImage.style.left = left + 'px';
+  cardImage.style.top = top + 'px';
+}
+
+
+    for (var i = 0; i < cardNames.length; i++) {
+        (function(index) {
+            cardNames[index].addEventListener('mousemove', function(e) {
+                positionCardImage(e, index);
+            });
+
+            cardNames[index].addEventListener('mouseenter', function() {
+                cardImages[index].style.display = 'block';
+            });
+
+            cardNames[index].addEventListener('mouseleave', function() {
+                cardImages[index].style.display = 'none';
+            });
+
+            decreaseButtons[index].addEventListener('click', function() {
+                var quantityElement = quantityElements[index];
+                var quantity = parseInt(quantityElement.textContent);
+
+                if (quantity > 1) {
+                    quantity--;
+                    quantityElement.textContent = quantity;
+                    updateTotalPrice();
                 }
+            });
 
-                totalPriceElement.textContent = totalPrice.toFixed(2);
-            }
+            increaseButtons[index].addEventListener('click', function() {
+                var quantityElement = quantityElements[index];
+                var quantity = parseInt(quantityElement.textContent);
 
-            for (var i = 0; i < cardNames.length; i++) {
-                (function(index) {
-                    cardNames[index].addEventListener('mousemove', function(e) {
-                        cardImages[index].style.left = e.clientX + 'px';
-                    });
+                quantity++;
+                quantityElement.textContent = quantity;
+                updateTotalPrice();
+            });
+        })(i);
+    }
 
-                    cardNames[index].addEventListener('mouseenter', function() {
-                        cardImages[index].style.display = 'block';
-                    });
+    updateTotalPrice();
+});
 
-                    cardNames[index].addEventListener('mouseleave', function() {
-                        cardImages[index].style.display = 'none';
-                    });
-
-                    decreaseButtons[index].addEventListener('click', function() {
-                        var quantityElement = quantityElements[index];
-                        var quantity = parseInt(quantityElement.textContent);
-
-                        if (quantity > 1) {
-                            quantity--;
-                            quantityElement.textContent = quantity;
-                            updateTotalPrice();
-                        }
-                    });
-
-                    increaseButtons[index].addEventListener('click', function() {
-                        var quantityElement = quantityElements[index];
-                        var quantity = parseInt(quantityElement.textContent);
-
-                        quantity++;
-                        quantityElement.textContent = quantity;
-                        updateTotalPrice();
-                    });
-                })(i);
-            }
-
-            updateTotalPrice();
-        });
     </script>
 </head>
 <body>
@@ -130,7 +161,7 @@
         {% for card in deck_list %}
         <div>
             <button class="quantity-decrease">-</button>
-            <span class="quantity">1</span>
+            <span class="quantity">{{ card.quantity }}</span>
             <button class="quantity-increase">+</button>
             <span class="card-name" title="{{ card.name }}">{{ card.name }}</span>
             <span class="card-price" data-price="{{ card.price_brl }}"> - R$ <span>{{ card.price_brl }}</span></span><br>

@@ -96,14 +96,26 @@ def add_deck():
         deck_name = request.form['deck_name']
         deck_list = request.form['deck_list']
 
-   
-
         card_names = [card.strip() for card in deck_list.split('\n') if card.strip()]  # Assume que as cartas estão separadas por linhas
 
-        cards = []
-        card_requests = []
+        deck = {}
         for card_name in card_names:
-            card_requests.append(card_name)
+            # Verifica se há um número no início do nome da carta
+            if card_name[0].isdigit():
+                # Extrai o número e o nome da carta
+                quantity, card_name = card_name.split(' ', 1)
+                quantity = int(quantity)
+            else:
+                quantity = 1
+
+            # Atualiza a quantidade correspondente da carta no deck
+            if card_name in deck:
+                deck[card_name] += quantity
+            else:
+                deck[card_name] = quantity
+
+        cards = []
+        card_requests = list(deck.keys())
 
         # Função para processar a carta em paralelo
         def process_card_parallel(card_name):
@@ -114,15 +126,22 @@ def add_deck():
             # Executa o processamento das cartas em paralelo e obtém os resultados
             cards = list(executor.map(process_card_parallel, card_requests))
 
-        # Filtra as cartas que não foram encontradas
-        cards = [card for card in cards if card is not None]
+        # Filtra as cartas que não foram encontradas e atualiza a quantidade no deck
+        filtered_cards = []
+        for card in cards:
+            if card is not None:
+                card_quantity = deck.get(card['name'], 0)
+                if card_quantity > 0:
+                    card['quantity'] = card_quantity
+                    filtered_cards.append(card)
 
         deck_formats = get_deck_formats(deck_list)
 
         # Renderização do template com as cartas
-        return render_template('deck.html', deck_name=deck_name, deck_list=cards, deck_formats=deck_formats)
+        return render_template('deck.html', deck_name=deck_name, deck_list=filtered_cards, deck_formats=deck_formats)
 
     return render_template('add_deck.html')
+
 
 def get_deck_formats(deck_list):
     formats = ['Standard', 'Modern', 'Legacy', 'Vintage']  # Exemplo de formatos disponíveis
