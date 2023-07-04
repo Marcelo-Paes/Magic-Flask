@@ -3,7 +3,8 @@ import requests
 import json
 import os
 from cachetools import TTLCache
-
+from concurrent.futures import ThreadPoolExecutor
+from math import ceil
 os.environ['EXCHANGERATE_API_KEY'] = 'sua_chave_de_api'
 app = Flask(__name__)
 
@@ -27,11 +28,33 @@ def search():
         # Armazenar a resposta em cache
         cache[card_name] = card_data
 
+    # Verificar se há múltiplas cartas com o mesmo nome
+    if 'data' in card_data and len(card_data['data']) > 1:
+        # Pegar apenas a primeira carta encontrada
+        card_data = card_data['data'][0]
+
     card_image = card_data['image_uris']['normal']
     card_description = card_data['oracle_text']
     card_price_usd = card_data['prices']['usd']
     card_price_brl = convert_to_brl(card_price_usd)
-    return render_template('result.html', card_name=card_name, card_image=card_image, card_description=card_description, card_price_brl=card_price_brl)
+
+    # Obter os formatos da carta
+    card_formats = {}
+    legalities = card_data.get('legalities', {})
+    for format_name, legality in legalities.items():
+        if legality == 'legal':
+            card_formats[format_name] = legality
+
+    # Verificar se é um terreno básico
+    basic_land_names = ['Forest', 'Island', 'Mountain', 'Plains', 'Swamp']
+    if card_name in basic_land_names:
+        card_price_brl = 'N/A'
+        response = requests.get(f'https://api.scryfall.com/cards/named?exact={card_name}')
+        card_data = json.loads(response.text)
+        card_image = card_data['image_uris']['normal']
+
+    return render_template('result.html', card_name=card_name, card_image=card_image, card_description=card_description, card_price_brl=card_price_brl, card_formats=card_formats)
+
 
 
 
@@ -52,42 +75,54 @@ def convert_to_brl(price_usd):
     price_brl = round(float(price_usd) * exchange_rate, 2)
     return price_brl
 
+def process_card(card_name):
+    try:
+        response = requests.get(f'https://api.scryfall.com/cards/named?exact={card_name.strip().replace(" ", "+")}')
+        card_data = json.loads(response.text)
+        card_image = card_data.get('image_uris', {}).get('normal')
+        if card_image:
+            card_name = card_data.get('name')
+            card_price_usd = card_data.get('prices', {}).get('usd')
+            card_price_brl = convert_to_brl(card_price_usd)
+            return {'name': card_name, 'image': card_image, 'price_brl': card_price_brl}
+        else:
+            return None
+    except (requests.exceptions.RequestException, json.JSONDecodeError):
+        return None
+
 @app.route('/add_deck', methods=['GET', 'POST'])
 def add_deck():
     if request.method == 'POST':
         deck_name = request.form['deck_name']
         deck_list = request.form['deck_list']
 
-        # Processar o arquivo de texto se fornecido
-        if 'file_input' in request.files:
-            file = request.files['file_input']
-            if file.filename.endswith('.txt'):
-                card_names = file.read().decode('utf-8').splitlines()
-                card_names = [card.strip() for card in card_names if card.strip()]
-                deck_list += '\n' + '\n'.join(card_names)
+   
 
         card_names = [card.strip() for card in deck_list.split('\n') if card.strip()]  # Assume que as cartas estão separadas por linhas
-        
+
         cards = []
         card_requests = []
         for card_name in card_names:
-            card_requests.append(f'https://api.scryfall.com/cards/named?exact={card_name.strip().replace(" ", "+")}')
-        
-        responses = [requests.get(url) for url in card_requests]
-        for response in responses:
-            card_data = json.loads(response.text)
-            card_image = card_data.get('image_uris', {}).get('normal')
-            if card_image:
-                card_name = card_data.get('name')
-                card_price_usd = card_data.get('prices', {}).get('usd')
-                card_price_brl = convert_to_brl(card_price_usd)
-                cards.append({'name': card_name, 'image': card_image, 'price_brl': card_price_brl})
-        
-        deck_formats = get_deck_formats(deck_list)
-        return render_template('deck.html', deck_name=deck_name, deck_list=cards, deck_formats=deck_formats)
-    
-    return render_template('add_deck.html')
+            card_requests.append(card_name)
 
+        # Função para processar a carta em paralelo
+        def process_card_parallel(card_name):
+            return process_card(card_name)
+
+        # Processamento paralelo das cartas
+        with ThreadPoolExecutor() as executor:
+            # Executa o processamento das cartas em paralelo e obtém os resultados
+            cards = list(executor.map(process_card_parallel, card_requests))
+
+        # Filtra as cartas que não foram encontradas
+        cards = [card for card in cards if card is not None]
+
+        deck_formats = get_deck_formats(deck_list)
+
+        # Renderização do template com as cartas
+        return render_template('deck.html', deck_name=deck_name, deck_list=cards, deck_formats=deck_formats)
+
+    return render_template('add_deck.html')
 
 def get_deck_formats(deck_list):
     formats = ['Standard', 'Modern', 'Legacy', 'Vintage']  # Exemplo de formatos disponíveis
