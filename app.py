@@ -24,6 +24,9 @@ def search():
         card_data = cache[card_name]
     else:
         response = requests.get(f'https://api.scryfall.com/cards/named?fuzzy={card_name}')
+        if response.status_code == 404:
+            # Carta não encontrada na API
+            return render_template('error.html', message='A carta não foi encontrada.')
         card_data = json.loads(response.text)
         # Armazenar a resposta em cache
         cache[card_name] = card_data
@@ -36,7 +39,13 @@ def search():
     card_image = card_data['image_uris']['normal']
     card_description = card_data['oracle_text']
     card_price_usd = card_data['prices']['usd']
-    card_price_brl = convert_to_brl(card_price_usd)
+
+    # Verificar se o preço em USD é None e atribuir 'N/A' como valor padrão
+    if card_price_usd is None:
+        card_price_usd = 'N/A'
+        card_price_brl = 'N/A'
+    else:
+        card_price_brl = convert_to_brl(float(card_price_usd))
 
     # Obter os formatos da carta
     card_formats = {}
@@ -48,15 +57,23 @@ def search():
     # Verificar se é um terreno básico
     basic_land_names = ['Forest', 'Island', 'Mountain', 'Plains', 'Swamp']
     if card_name in basic_land_names:
+        card_price_usd = 'N/A'
         card_price_brl = 'N/A'
         response = requests.get(f'https://api.scryfall.com/cards/named?exact={card_name}')
+        if response.status_code == 404:
+            # Carta básica não encontrada na API
+            return render_template('error.html', message='A carta básica não foi encontrada.')
         card_data = json.loads(response.text)
         card_image = card_data['image_uris']['normal']
 
-    return render_template('result.html', card_name=card_name, card_image=card_image, card_description=card_description, card_price_brl=card_price_brl, card_formats=card_formats)
+    return render_template('result.html', card_name=card_name, card_image=card_image, card_description=card_description, card_price_usd=card_price_usd, card_price_brl=card_price_brl, card_formats=card_formats)
 
 
-
+# Rota de erro
+@app.route('/error')
+def error():
+    card_name = request.args.get('card_name')
+    return render_template('error.html', card_name=card_name)
 
 @app.route('/result')
 def result():
@@ -66,6 +83,12 @@ def result():
     card_image = card_data['image_uris']['normal']
     card_description = card_data['oracle_text']
     card_price = card_data['prices']['usd']
+
+    # Verificar se é um terreno básico
+    basic_land_names = ['Forest', 'Island', 'Mountain', 'Plains', 'Swamp']
+    if card_name in basic_land_names:
+        card_price = 'N/A'
+
     return render_template('result.html', card_name=card_name, card_image=card_image, card_description=card_description, card_price=card_price)
 
 def convert_to_brl(price_usd):
@@ -99,6 +122,17 @@ def add_deck():
         card_names = [card.strip() for card in deck_list.split('\n') if card.strip()]  # Assume que as cartas estão separadas por linhas
 
         deck = {}
+        format_counts = {
+            'standard': 0,
+            'modern': 0,
+            'legacy': 0,
+            'vintage': 0,
+            'commander': 0,
+            'pauper': 0,
+            'pioneer': 0,
+            'historic': 0
+        }
+
         for card_name in card_names:
             # Verifica se há um número no início do nome da carta
             if card_name[0].isdigit():
@@ -128,24 +162,53 @@ def add_deck():
 
         # Filtra as cartas que não foram encontradas e atualiza a quantidade no deck
         filtered_cards = []
+
         for card in cards:
             if card is not None:
-                card_quantity = deck.get(card['name'], 0)
-                if card_quantity > 0:
-                    card['quantity'] = card_quantity
+                card_name = card['name']
+                if card_name in deck:
+                    card['quantity'] = 1  # Definindo a quantidade como 1 para cada carta encontrada
+
+                    # Atualiza a contagem de formatos
+                    for format_name in card['formats']:
+                        if format_name in format_counts:
+                            format_counts[format_name] += 1
+
                     filtered_cards.append(card)
 
-        deck_formats = get_deck_formats(deck_list)
-
-        # Renderização do template com as cartas
-        return render_template('deck.html', deck_name=deck_name, deck_list=filtered_cards, deck_formats=deck_formats)
+        # Renderização do template com as cartas e formato do deck
+        return render_template('deck.html', deck_name=deck_name, deck_list=filtered_cards, format_counts=format_counts)
 
     return render_template('add_deck.html')
 
+def process_card(card_name):
+    try:
+        response = requests.get(f'https://api.scryfall.com/cards/named?exact={card_name.strip().replace(" ", "+")}')
+        card_data = json.loads(response.text)
+        card_image = card_data.get('image_uris', {}).get('normal')
+        if card_image:
+            card_name = card_data.get('name')
+            card_price_usd = card_data.get('prices', {}).get('usd')
+            card_price_brl = convert_to_brl(card_price_usd)
 
-def get_deck_formats(deck_list):
-    formats = ['Standard', 'Modern', 'Legacy', 'Vintage']  # Exemplo de formatos disponíveis
-    return formats  # Substitua esta lógica com a verificação real do deck
+            # Obter os formatos válidos da carta
+            valid_formats = []
+            legalities = card_data.get('legalities', {})
+            for format_name, legality in legalities.items():
+                if legality == 'legal':
+                    valid_formats.append(format_name)
+
+            #print("Formatos válidos da carta:", valid_formats)
+
+            return {'name': card_name, 'image': card_image, 'price_brl': card_price_brl, 'formats': valid_formats}
+        else:
+            return None
+    except (requests.exceptions.RequestException, json.JSONDecodeError):
+        return None
+
+
+    
+
 
 if __name__ == '__main__':
     app.run()

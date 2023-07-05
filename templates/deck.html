@@ -10,13 +10,13 @@
           background-size: cover;
         }
         .card-image {
-        position: absolute;
-        display: none;
-        pointer-events: none;
-        z-index: 999;
-        width: auto; /* Defina a largura desejada */
-        height: 400px; /* Defina a altura desejada */
-}
+            position: absolute;
+            display: none;
+            pointer-events: none;
+            z-index: 999;
+            width: auto; /* Defina a largura desejada */
+            height: 400px; /* Defina a altura desejada */
+        }
 
         .card-name {
             position: relative;
@@ -24,8 +24,52 @@
         }
 
         .deck-content {
-            display: block;
+            display: flex;
         }
+
+        .deck-list {
+            flex: 1;
+            margin-right: 20px;
+        }
+
+        .format-list {
+            flex: 3;
+            padding-top: 20px;
+            padding-left: 20px;
+           
+            box-sizing: initial
+        }
+
+        .format-list h2 {
+            margin-top: 0;
+            color: #000000;
+        }
+
+        .format-list table {
+            width: 30%;
+        }
+
+        .format-list td {
+            font-size: 16px;
+            background-color: #b7b6b6;
+            padding: 10px;
+            border: 1px solid #ed0f0f;
+            color: #000000;
+            margin-bottom: 5px; 
+            max-width: 200px;/* Ajuste a margem inferior conforme necessário */
+        }
+
+        .format-list td:first-child {
+            font-weight: bold;
+        }
+
+        .format-list td:last-child {
+            text-align: right;
+        }
+        
+
+
+
         nav {
           background-color: #f1f1f1;
         }
@@ -54,96 +98,94 @@
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-    var cardNames = document.getElementsByClassName('card-name');
-    var cardImages = document.getElementsByClassName('card-image');
-    var decreaseButtons = document.getElementsByClassName('quantity-decrease');
-    var increaseButtons = document.getElementsByClassName('quantity-increase');
-    var quantityElements = document.getElementsByClassName('quantity');
-    var totalPriceElement = document.getElementById('total-price');
-    var cardPrices = document.getElementsByClassName('card-price');
+            var cardNames = document.getElementsByClassName('card-name');
+            var cardImages = document.getElementsByClassName('card-image');
+            var decreaseButtons = document.getElementsByClassName('quantity-decrease');
+            var increaseButtons = document.getElementsByClassName('quantity-increase');
+            var quantityElements = document.getElementsByClassName('quantity');
+            var totalPriceElement = document.getElementById('total-price');
+            var cardPrices = document.getElementsByClassName('card-price');
 
-    function updateTotalPrice() {
-        var totalPrice = 0;
+            function updateTotalPrice() {
+                var totalPrice = 0;
 
-        for (var i = 0; i < quantityElements.length; i++) {
-            var price = parseFloat(cardPrices[i].getAttribute('data-price'));
-            var quantity = parseInt(quantityElements[i].textContent);
-            var subtotal = price * quantity;
-            totalPrice += subtotal;
-            cardPrices[i].textContent = subtotal.toFixed(2);
-        }
-
-        totalPriceElement.textContent = totalPrice.toFixed(2);
-    }
-
-    function positionCardImage(e, index) {
-  var cursorX = e.clientX;
-  var cursorY = e.clientY;
-  var cardImage = cardImages[index];
-
-  var cardWidth = cardImage.offsetWidth;
-  var cardHeight = cardImage.offsetHeight;
-
-  var windowWidth = window.innerWidth;
-  var windowHeight = window.innerHeight;
-
-  var left = cursorX + (-10);
-  var top = cursorY + (-10);
-
-  // Verificar limite direito da janela
-  if (left + cardWidth > windowWidth) {
-    left = windowWidth - cardWidth;
-  }
-
-  // Verificar limite inferior da janela
-  if (top + cardHeight > windowHeight) {
-    top = windowHeight - cardHeight;
-  }
-
-  cardImage.style.left = left + 'px';
-  cardImage.style.top = top + 'px';
-}
-
-
-    for (var i = 0; i < cardNames.length; i++) {
-        (function(index) {
-            cardNames[index].addEventListener('mousemove', function(e) {
-                positionCardImage(e, index);
-            });
-
-            cardNames[index].addEventListener('mouseenter', function() {
-                cardImages[index].style.display = 'block';
-            });
-
-            cardNames[index].addEventListener('mouseleave', function() {
-                cardImages[index].style.display = 'none';
-            });
-
-            decreaseButtons[index].addEventListener('click', function() {
-                var quantityElement = quantityElements[index];
-                var quantity = parseInt(quantityElement.textContent);
-
-                if (quantity > 1) {
-                    quantity--;
-                    quantityElement.textContent = quantity;
-                    updateTotalPrice();
+                for (var i = 0; i < quantityElements.length; i++) {
+                    var price = parseFloat(cardPrices[i].getAttribute('data-price'));
+                    var quantity = parseInt(quantityElements[i].textContent);
+                    var subtotal = price * quantity;
+                    totalPrice += subtotal;
+                    cardPrices[i].textContent = subtotal.toFixed(2);
                 }
-            });
 
-            increaseButtons[index].addEventListener('click', function() {
-                var quantityElement = quantityElements[index];
-                var quantity = parseInt(quantityElement.textContent);
+                totalPriceElement.textContent = totalPrice.toFixed(2);
+            }
 
-                quantity++;
-                quantityElement.textContent = quantity;
-                updateTotalPrice();
-            });
-        })(i);
-    }
+            function positionCardImage(e, index) {
+                var cursorX = e.clientX;
+                var cursorY = e.clientY;
+                var cardImage = cardImages[index];
 
-    updateTotalPrice();
-});
+                var cardWidth = cardImage.offsetWidth;
+                var cardHeight = cardImage.offsetHeight;
 
+                var windowWidth = window.innerWidth;
+                var windowHeight = window.innerHeight;
+
+                var left = cursorX + (-10);
+                var top = cursorY + (-10);
+
+                // Verificar limite direito da janela
+                if (left + cardWidth > windowWidth) {
+                    left = windowWidth - cardWidth;
+                }
+
+                // Verificar limite inferior da janela
+                if (top + cardHeight > windowHeight) {
+                    top = windowHeight - cardHeight;
+                }
+
+                cardImage.style.left = left + 'px';
+                cardImage.style.top = top + 'px';
+            }
+
+            for (var i = 0; i < cardNames.length; i++) {
+                (function(index) {
+                    cardNames[index].addEventListener('mousemove', function(e) {
+                        positionCardImage(e, index);
+                    });
+
+                    cardNames[index].addEventListener('mouseenter', function() {
+                        cardImages[index].style.display = 'block';
+                    });
+
+                    cardNames[index].addEventListener('mouseleave', function() {
+                        cardImages[index].style.display = 'none';
+                    });
+
+                    decreaseButtons[index].addEventListener('click', function() {
+                        var quantityElement = quantityElements[index];
+                        var quantity = parseInt(quantityElement.textContent);
+
+                        if (quantity > 1) {
+                            quantity--;
+                            quantityElement.textContent = quantity;
+                            updateTotalPrice();
+                        }
+                    });
+
+                    increaseButtons[index].addEventListener('click', function() {
+                        var quantityElement = quantityElements[index];
+                        var quantity = parseInt(quantityElement.textContent);
+
+                        quantity++;
+                        quantityElement.textContent = quantity;
+                        updateTotalPrice();
+                    });
+                })(i);
+            }
+
+            updateTotalPrice();
+        });
     </script>
 </head>
 <body>
@@ -152,25 +194,41 @@
           <li><a href="/">Index</a></li>
           <li><a href="add_deck">Add Deck</a></li>
         </ul>
-      </nav>
+    </nav>
+
     <div id="deckContent" class="deck-content">
-        <h1>Deck Info</h1>
-        <h2>{{ deck_name }}</h2>
-        <h3>Deck List:</h3>
+        <div class="deck-list">
+            <h1>Deck Info</h1>
+            <h2>{{ deck_name }}</h2>
+            <h3>Deck List:</h3>
 
-        {% for card in deck_list %}
-        <div>
-            <button class="quantity-decrease">-</button>
-            <span class="quantity">{{ card.quantity }}</span>
-            <button class="quantity-increase">+</button>
-            <span class="card-name" title="{{ card.name }}">{{ card.name }}</span>
-            <span class="card-price" data-price="{{ card.price_brl }}"> - R$ <span>{{ card.price_brl }}</span></span><br>
-            <img class="card-image" src="{{ card.image }}" alt="{{ card.name }}"><br>
+            {% for card in deck_list %}
+            <div>
+                <button class="quantity-decrease">-</button>
+                <span class="quantity">{{ card.quantity }}</span>
+                <button class="quantity-increase">+</button>
+                <span class="card-name" title="{{ card.name }}">{{ card.name }}</span>
+                <span class="card-price" data-price="{{ card.price_brl }}"> - R$ <span>{{ card.price_brl }}</span></span><br>
+                <img class="card-image" src="{{ card.image }}" alt="{{ card.name }}"><br>
+            </div>
+            {% endfor %}
+
+            <p>Total do Deck List: R$ <span id="total-price"></span></p>
         </div>
-        {% endfor %}
 
-        <p>Total do Deck List: R$ <span id="total-price"></span></p>
-    </div>
-    
+        <div class="format-list">
+            <h2>Formatos:</h2>
+            <p>O seu deck possui {{ deck_list|length }} carta(s) diferentes</p>
+            <table>
+                <tbody>
+                    {% for format_name, count in format_counts.items() %}
+                    <tr>
+                        <td>Formato {{ format_name }}:</td>
+                        <td>{{ count }} carta(s)</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
 </body>
 </html>
