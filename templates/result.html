@@ -1,155 +1,47 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tela_resultado.css') }}">
     <title>Search Result</title>
-    <style>
-        body {
-            background-image: url('https://rare-gallery.com/thumbs/4548984-magic-the-gathering-elesh-norn-phyrexia.jpg');
-            background-repeat: no-repeat;
-            background-size: cover;
-            font-family: Arial, sans-serif;
-        }
-
-        h1 {
-            text-align: center;
-            color: #202020;
-        }
-
-        form {
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        form label {
-            color: #202020;
-            font-size: 18px;
-            margin-right: 10px;
-        }
-
-        form input[type="text"] {
-            padding: 5px;
-            font-size: 16px;
-            border-radius: 5px;
-            border: none;
-        }
-
-        form button[type="submit"] {
-            padding: 8px 15px;
-            font-size: 16px;
-            background-color: #4CAF50;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 20px auto;
-            background-color: rgba(255, 255, 255, 0.9);
-            border-radius: 5px;
-            padding: 20px;
-            display: flex;
-            align-items: center;
-        }
-
-        .container .card-image {
-            width: 500px;
-            margin-right: 20px;
-        }
-
-        .container .card-info {
-            flex: 1;
-        }
-
-        .container h2 {
-            margin-top: 0;
-            font-size: 24px;
-            color: #333;
-        }
-
-        .container h3 {
-            margin-bottom: 10px;
-            font-size: 18px;
-            color: #333;
-        }
-
-        .container ul {
-            padding: 0;
-            margin: 0;
-            list-style-type: none;
-        }
-
-        .container li {
-            margin-bottom: 5px;
-            font-size: 16px;
-            color: #333;
-        }
-
-        .container p {
-            margin: 0 0 10px 0;
-            font-size: 16px;
-            color: #333;
-        }
-
-        .container p.price {
-            font-weight: bold;
-        }
-        nav {
-          background-color: #f1f1f1;
-        }
-
-        nav ul {
-          list-style-type: none;
-          margin: 0;
-          padding: 0;
-          display: flex;
-        }
-
-        nav li {
-          margin-right: 10px;
-        }
-
-        nav li a {
-          display: block;
-          padding: 10px 20px;
-          text-decoration: none;
-          color: #333;
-        }
-
-        nav li a:hover {
-          background-color: #ddd;
-        }
-    </style>
 </head>
 <body>
     <nav>
-        <ul>
+        <div class="menu-toggle">
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+        </div>
+        <ul class="menu">
           <li><a href="/">Index</a></li>
           <li><a href="add_deck">Add Deck</a></li>
         </ul>
-      </nav>
+    </nav>
     <h1>Search Result</h1>
     <form action="/search" method="POST">
-        <label for="card_name">New Card Name:</label>
-        <input type="text" id="card_name" name="card_name" required>
+        
+        <input type="text" id="card_name" name="card_name" required placeholder="New Card Name">
         <button type="submit">Search</button>
     </form>
     <div class="container">
         <img class="card-image" src="{{ card_image }}" alt="{{ card_name }}">
         <div class="card-info">
             <h2>{{ card_name }}</h2>
-            <h3>Formats:</h3>
-            <ul>
-            {% for format in card_formats %}
-                <li>{{ format }}</li>
-            {% endfor %}
-            </ul>
-            <br>
-            <p>{{ card_description }}</p>
+            
+            <p>
+                <span class="format-label">Formatos:</span>
+                {% for format in card_formats %}
+                {{ format }}{% if not loop.last %}, {% endif %}{% endfor %}
+              </p>
             <p class="price">Price: {{ card_price_brl }} BRL</p>
-        </div>
-    </div>
+          </div>
+    <script>
+        const menuToggle = document.querySelector('.menu-toggle');
+        const menu = document.querySelector('.menu');
+
+        menuToggle.addEventListener('click', () => {
+            menu.classList.toggle('show-menu');
+        });
+    </script>
 </body>
-</html
+</html>

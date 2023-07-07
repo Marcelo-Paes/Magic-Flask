@@ -1,102 +1,37 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tela_inicio.css') }}">
     <title>Search Magic Cards</title>
-    <style>
-        body {
-            background-image: url('https://rare-gallery.com/thumbs/4548984-magic-the-gathering-elesh-norn-phyrexia.jpg');
-            background-repeat: no-repeat;
-            background-size: cover;
-            font-family: Arial, sans-serif;
-        }
-
-        .container {
-            max-width: 500px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: rgba(255, 255, 255, 0.9);
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-        }
-
-        .container h1 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .container form {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .container label {
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
-
-        .container input[type="text"] {
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            width: 100%;
-        }
-
-        .container button {
-            padding: 10px 20px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            width: 100px;
-        }
-
-        .container button:hover {
-            background-color: #45a049;
-        }
-        nav {
-          background-color: #f1f1f1;
-        }
-
-        nav ul {
-          list-style-type: none;
-          margin: 0;
-          padding: 0;
-          display: flex;
-        }
-
-        nav li {
-          margin-right: 10px;
-        }
-
-        nav li a {
-          display: block;
-          padding: 10px 20px;
-          text-decoration: none;
-          color: #333;
-        }
-
-        nav li a:hover {
-          background-color: #ddd;
-        }
-    </style>
+    
 </head>
 <body>
   <nav>
-    <ul>
-      <li><a href="/">Index</a></li>
-      <li><a href="add_deck">Add Deck</a></li>
-    </ul>
+      <div class="menu-toggle">
+          <div class="bar"></div>
+          <div class="bar"></div>
+          <div class="bar"></div>
+      </div>
+      <ul class="menu">
+        <li><a href="/">Index</a></li>
+        <li><a href="add_deck">Add Deck</a></li>
+      </ul>
   </nav>
-    <div class="container">
-        <h1>Search Magic Cards</h1>
-        <form action="/search" method="POST">
-            <label for="card_name">Card Name:</label>
-            <input type="text" id="card_name" name="card_name" required>
-            <button type="submit">Search</button>
-        </form>
-    </div>
+  <h1>Search Result</h1>
+  <form action="/search" method="POST">
+      
+      <input type="text" id="card_name" name="card_name" required placeholder="New Card Name">
+      <button type="submit">Search</button>
+  </form>
+  <script>
+    const menuToggle = document.querySelector('.menu-toggle');
+    const menu = document.querySelector('.menu');
+
+    menuToggle.addEventListener('click', () => {
+        menu.classList.toggle('show-menu');
+    });
+</script>
+
 </body>
 </html>

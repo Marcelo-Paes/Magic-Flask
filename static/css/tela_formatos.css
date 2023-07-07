@@ -1,0 +1,92 @@
+
+body {
+  background-image: url('https://rare-gallery.com/thumbs/4548984-magic-the-gathering-elesh-norn-phyrexia.jpg');
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+.card-image {
+    position: absolute;
+    display: none;
+    pointer-events: none;
+    z-index: 999;
+    width: auto; /* Defina a largura desejada */
+    height: 400px; /* Defina a altura desejada */
+}
+
+.card-name {
+    position: relative;
+    display: inline-block;
+}
+
+.deck-content {
+    display: flex;
+}
+
+.deck-list {
+    flex: 1;
+    margin-right: 20px;
+}
+
+.format-list {
+    flex: 3;
+    padding-top: 20px;
+    padding-left: 20px;
+   
+    box-sizing: initial
+}
+
+.format-list h2 {
+    margin-top: 0;
+    color: #000000;
+}
+
+.format-list table {
+    width: 30%;
+}
+
+.format-list td {
+    font-size: 16px;
+    background-color: #b7b6b6;
+    padding: 10px;
+    border: 1px solid #ed0f0f;
+    color: #000000;
+    margin-bottom: 5px; 
+    max-width: 200px;/* Ajuste a margem inferior conforme necessário */
+}
+
+.format-list td:first-child {
+    font-weight: bold;
+}
+
+.format-list td:last-child {
+    text-align: right;
+}
+
+
+
+
+nav {
+  background-color: #f1f1f1;
+}
+
+nav ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+}
+
+nav li {
+  margin-right: 10px;
+}
+
+nav li a {
+  display: block;
+  padding: 10px 20px;
+  text-decoration: none;
+  color: #333;
+}
+
+nav li a:hover {
+  background-color: #ddd;
+}

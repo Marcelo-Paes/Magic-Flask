@@ -1,0 +1,225 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-image: url("https://cutewallpaper.org/28/cool-mtg-wallpaper/theros-constellation-land-wallpapers-rmagictcg.png");
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+  
+  .card-image {
+    position: absolute;
+    display: none;
+    pointer-events: none;
+    z-index: 999;
+    width: auto;
+    height: 400px;
+  }
+  
+  .deck-content {
+    margin: 5px;
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .deck-list {
+    flex: 1;
+    margin-right: 20px;
+    background-color: rgba(106, 83, 131, 0.8); /* Cor roxa mais escura */
+    padding: 20px;
+    border-radius: 5px;
+  }
+  
+  .deck-list h1 {
+    color: #ffffff; /* Cor de texto branca */
+    font-size: 24px;
+    margin-top: 0;
+  }
+  
+  .deck-list h2 {
+    color: #ffffff; /* Cor de texto branca */
+    font-size: 18px;
+    margin-top: 10px;
+  }
+  
+  .deck-list h3 {
+    color: #ffffff; /* Cor de texto branca */
+    font-size: 16px;
+    margin-top: 20px;
+  }
+  
+  .deck-list p {
+    color: #ffffff; /* Cor de texto branca */
+    margin-bottom: 10px;
+  }
+  
+  .deck-list button {
+    padding: 5px 10px;
+    background-color: #7b579f; /* Cor roxa mais escura */
+    color: #ffffff; /* Cor de texto branca */
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background-color 0.3s ease; /* Adiciona uma transição suave */
+  }
+  
+  .deck-list button:hover {
+    background-color: #68468b; /* Cor roxa mais clara ao passar o mouse */
+  }
+  
+  .deck-list .card-name {
+    color: #ffffff; /* Cor de texto branca */
+    font-weight: bold;
+  }
+  
+  .deck-list .card-price {
+    color: #ffffff; /* Cor de texto branca */
+  }
+  
+  .deck-list .card-image {
+    width: 400;
+    max-height: auto;
+    object-fit: cover;
+    border-radius: 5px;
+    margin-top: 10px;
+  }
+  
+.quantity{
+    color: #ffffff;
+}
+
+  
+  .format-list {
+    flex: 3;
+    padding-top: 20px;
+    padding-left: 20px;
+    box-sizing: initial;
+  }
+  
+  .format-list h2 {
+    margin-top: 0;
+    color: #ffffff; /* Cor de texto branca */
+  }
+  
+  .format-list table {
+    width: 30%;
+  }
+  
+  .format-list td {
+    font-size: 16px;
+    background-color: #8a05be; /* Cor roxa */
+    padding: 10px;
+    border: 1px solid #ffffff; /* Cor de borda branca */
+    color: #ffffff; /* Cor de texto branca */
+    margin-bottom: 5px;
+    max-width: 200px;
+  }
+  
+  .format-list td:first-child {
+    font-weight: bold;
+  }
+  
+  .format-list td:last-child {
+    text-align: right;
+  }
+  
+  /* Estilos do menu */
+  nav {
+    background-color: #543d76;
+    color: #ffffff;
+    padding: 10px;
+  }
+  
+  .menu-toggle {
+    display: none;
+  }
+  
+  .menu {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .menu li {
+    display: inline-block;
+    margin-right: 10px;
+  }
+  
+  .menu li a {
+    color: #ffffff; /* Cor de texto branca */
+    text-decoration: none;
+    padding: 5px;
+  }
+  
+  .show-menu {
+    display: block;
+  }
+  
+  /* Estilos para dispositivos móveis */
+  @media screen and (max-width: 600px) {
+    .container {
+      flex-direction: column;
+    }
+  
+    .card-image {
+      margin-bottom: 20px;
+    }
+  
+    .card-info {
+      text-align: center;
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  /* Estilos da tabela */
+.format-list table {
+    width: 30%;
+    border-collapse: collapse; /* Remove as bordas internas da tabela */
+  }
+
+  .format-list p {
+    font-size: 16px;
+    background-color: rgba(106, 83, 131, 0.8); /* Cor roxa */
+    padding: 10px;
+    border: none; /* Remove as bordas internas das células */
+    color: #efecec; /* Cor de texto branca */
+    margin-bottom: 5px;
+    width: 28.5%;
+    height: auto;
+   
+  }
+  
+  .format-list td {
+    font-size: 16px;
+    background-color: rgba(106, 83, 131, 0.8); /* Cor roxa */
+    padding: 10px;
+    border: none; /* Remove as bordas internas das células */
+    color: #efecec; /* Cor de texto branca */
+    margin-bottom: 5px;
+    max-width: 200px;
+    height: auto;
+  }
+  
+  .format-list td:first-child {
+    font-weight: bold;
+  }
+  
+  .format-list td:last-child {
+    text-align: right;
+  }
+  
+  /* Estilos dos botões */
+  .container button {
+    padding: 10px 20px;
+    background-color: #7b579f; /* Cor roxa mais escura */
+    color: #ffffff; /* Cor de texto branca */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease; /* Adiciona uma transição suave */
+  }
+  
+  .container button:hover {
+    background-color: #68468b; /* Cor roxa mais clara ao passar o mouse */
+  }
+

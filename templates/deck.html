@@ -2,100 +2,8 @@
 <html>
 <head>
     <title>Deck Info</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <style>
-         body {
-          background-image: url('https://rare-gallery.com/thumbs/4548984-magic-the-gathering-elesh-norn-phyrexia.jpg');
-          background-repeat: no-repeat;
-          background-size: cover;
-        }
-        .card-image {
-            position: absolute;
-            display: none;
-            pointer-events: none;
-            z-index: 999;
-            width: auto; /* Defina a largura desejada */
-            height: 400px; /* Defina a altura desejada */
-        }
-
-        .card-name {
-            position: relative;
-            display: inline-block;
-        }
-
-        .deck-content {
-            display: flex;
-        }
-
-        .deck-list {
-            flex: 1;
-            margin-right: 20px;
-        }
-
-        .format-list {
-            flex: 3;
-            padding-top: 20px;
-            padding-left: 20px;
-           
-            box-sizing: initial
-        }
-
-        .format-list h2 {
-            margin-top: 0;
-            color: #000000;
-        }
-
-        .format-list table {
-            width: 30%;
-        }
-
-        .format-list td {
-            font-size: 16px;
-            background-color: #b7b6b6;
-            padding: 10px;
-            border: 1px solid #ed0f0f;
-            color: #000000;
-            margin-bottom: 5px; 
-            max-width: 200px;/* Ajuste a margem inferior conforme necessário */
-        }
-
-        .format-list td:first-child {
-            font-weight: bold;
-        }
-
-        .format-list td:last-child {
-            text-align: right;
-        }
-        
-
-
-
-        nav {
-          background-color: #f1f1f1;
-        }
-
-        nav ul {
-          list-style-type: none;
-          margin: 0;
-          padding: 0;
-          display: flex;
-        }
-
-        nav li {
-          margin-right: 10px;
-        }
-
-        nav li a {
-          display: block;
-          padding: 10px 20px;
-          text-decoration: none;
-          color: #333;
-        }
-
-        nav li a:hover {
-          background-color: #ddd;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tela_deck_final.css') }}">
+   
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             var cardNames = document.getElementsByClassName('card-name');
@@ -186,23 +94,71 @@
 
             updateTotalPrice();
         });
+        class MobileNavbar {
+  constructor(mobileMenu, navList, navLinks) {
+    this.mobileMenu = document.querySelector(mobileMenu);
+    this.navList = document.querySelector(navList);
+    this.navLinks = document.querySelectorAll(navLinks);
+    this.activeClass = "active";
+
+    this.handleClick = this.handleClick.bind(this);
+  }
+
+  animateLinks() {
+    this.navLinks.forEach((link, index) => {
+      link.style.animation
+        ? (link.style.animation = "")
+        : (link.style.animation = `navLinkFade 0.5s ease forwards ${
+            index / 7 + 0.3
+          }s`);
+    });
+  }
+
+  handleClick() {
+    this.navList.classList.toggle(this.activeClass);
+    this.mobileMenu.classList.toggle(this.activeClass);
+    this.animateLinks();
+  }
+
+  addClickEvent() {
+    this.mobileMenu.addEventListener("click", this.handleClick);
+  }
+
+  init() {
+    if (this.mobileMenu) {
+      this.addClickEvent();
+    }
+    return this;
+  }
+}
+
+const mobileNavbar = new MobileNavbar(
+  ".mobile-menu",
+  ".nav-list",
+  ".nav-list li",
+);
+mobileNavbar.init();
     </script>
 </head>
 <body>
-    <nav>
-        <ul>
-          <li><a href="/">Index</a></li>
-          <li><a href="add_deck">Add Deck</a></li>
-        </ul>
-    </nav>
-
+  <nav>
+      <div class="menu-toggle">
+          <div class="bar"></div>
+          <div class="bar"></div>
+          <div class="bar"></div>
+      </div>
+      <ul class="menu">
+        <li><a href="/">Index</a></li>
+        <li><a href="add_deck">Add Deck</a></li>
+      </ul>
+  </nav>
     <div id="deckContent" class="deck-content">
         <div class="deck-list">
-            <h1>Deck Info</h1>
+            <h1>Deck</h1>
             <h2>{{ deck_name }}</h2>
             <h3>Deck List:</h3>
 
-            {% for card in deck_list %}
+            <p>{% for card in deck_list %}</p>
             <div>
                 <button class="quantity-decrease">-</button>
                 <span class="quantity">{{ card.quantity }}</span>
@@ -213,22 +169,28 @@
             </div>
             {% endfor %}
 
-            <p>Total do Deck List: R$ <span id="total-price"></span></p>
+            
         </div>
-
+        
         <div class="format-list">
             <h2>Formatos:</h2>
-            <p>O seu deck possui {{ deck_list|length }} carta(s) diferentes</p>
+            
             <table>
+              
                 <tbody>
+                  
                     {% for format_name, count in format_counts.items() %}
                     <tr>
                         <td>Formato {{ format_name }}:</td>
                         <td>{{ count }} carta(s)</td>
                     </tr>
                     {% endfor %}
+                    
                 </tbody>
+               
             </table>
+            <p>O seu deck possui {{ deck_list|length }} carta(s) diferentes</p>
+            <p>Total do Deck List: R$ <span id="total-price"></span></p>
         </div>
 </body>
 </html>

@@ -2,41 +2,15 @@
 <html>
 <head>
     <title>Erro</title>
-    <style>
-        /* Estilos CSS */
-        body {
-            font-family: Arial, sans-serif;
-        }
-
-        .menu {
-            background-color: #333;
-            color: #fff;
-            padding: 10px;
-        }
-
-        .menu a {
-            color: #fff;
-            text-decoration: none;
-            margin-right: 10px;
-        }
-
-        .content {
-            margin: 50px auto;
-            width: 400px;
-            text-align: center;
-        }
-
-        .error-image {
-            margin-bottom: 20px;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/erro.css') }}">
 </head>
-<body>
-    <div class="menu">
-        <a href="/">Início</a>
-        <a href="/add_deck">Pesquisar</a>
-        <!-- Adicione aqui outros links do menu -->
-    </div>
+<body class="pag_erro">
+    <nav>
+        <ul>
+          <li><a href="/">Index</a></li>
+          <li><a href="add_deck">Add Deck</a></li>
+        </ul>
+    </nav>
     <div class="content">
         <h1>Ocorreu um erro</h1>
         <img src="https://cdnb.artstation.com/p/assets/images/images/053/863/459/original/erin-loelius-afr-mindflayer.gif?1663190835" alt="Erro">

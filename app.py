@@ -23,18 +23,24 @@ def search():
     if card_name in cache:
         card_data = cache[card_name]
     else:
-        response = requests.get(f'https://api.scryfall.com/cards/named?fuzzy={card_name}')
+        response = requests.get(f'https://api.scryfall.com/cards/autocomplete?q={card_name}')
         if response.status_code == 404:
-            # Carta não encontrada na API
-            return render_template('error.html', message='A carta não foi encontrada.')
+            # Nenhum resultado encontrado para a busca parcial
+            return render_template('error.html', message='Nenhum resultado encontrado para a busca parcial.')
         card_data = json.loads(response.text)
+        if 'data' not in card_data or len(card_data['data']) == 0:
+            # Nenhum resultado encontrado para a busca parcial
+            return render_template('error.html', message='Nenhum resultado encontrado para a busca parcial.')
+        card_name = card_data['data'][0]
         # Armazenar a resposta em cache
         cache[card_name] = card_data
 
-    # Verificar se há múltiplas cartas com o mesmo nome
-    if 'data' in card_data and len(card_data['data']) > 1:
-        # Pegar apenas a primeira carta encontrada
-        card_data = card_data['data'][0]
+    # Fazer uma nova requisição para obter os detalhes da carta
+    response = requests.get(f'https://api.scryfall.com/cards/named?exact={card_name}')
+    if response.status_code == 404:
+        # Carta não encontrada na API
+        return render_template('error.html', message='A carta não foi encontrada.')
+    card_data = json.loads(response.text)
 
     card_image = card_data['image_uris']['normal']
     card_description = card_data['oracle_text']
@@ -80,9 +86,16 @@ def result():
     card_name = request.args.get('card_name')
     response = requests.get(f'https://api.scryfall.com/cards/named?exact={card_name.strip().replace(" ", "+")}')
     card_data = json.loads(response.text)
-    card_image = card_data['image_uris']['normal']
-    card_description = card_data['oracle_text']
-    card_price = card_data['prices']['usd']
+
+    card_image = ''
+    if 'image_uris' in card_data:
+        if 'normal' in card_data['image_uris']:
+            card_image = card_data['image_uris']['normal']
+        elif 'png' in card_data['image_uris']:
+            card_image = card_data['image_uris']['png']
+
+    card_description = card_data.get('oracle_text', '')
+    card_price = card_data['prices'].get('usd', 'N/A')
 
     # Verificar se é um terreno básico
     basic_land_names = ['Forest', 'Island', 'Mountain', 'Plains', 'Swamp']
@@ -91,11 +104,15 @@ def result():
 
     return render_template('result.html', card_name=card_name, card_image=card_image, card_description=card_description, card_price=card_price)
 
+
 def convert_to_brl(price_usd):
     response = requests.get('https://api.bcb.gov.br/dados/serie/bcdata.sgs.10813/dados?formato=json')
     exchange_data = json.loads(response.text)
     exchange_rate = float(exchange_data[-1]['valor'])
-    price_brl = round(float(price_usd) * exchange_rate, 2)
+    if price_usd is None:
+        price_brl = "N/A"  # Ou qualquer outro valor padrão desejado
+    else:
+        price_brl = round(float(price_usd) * exchange_rate, 2)
     return price_brl
 
 def process_card(card_name):
@@ -115,10 +132,11 @@ def process_card(card_name):
 
 @app.route('/add_deck', methods=['GET', 'POST'])
 def add_deck():
+    deck_name = ''
     if request.method == 'POST':
         deck_name = request.form['deck_name']
         deck_list = request.form['deck_list']
-
+        
         card_names = [card.strip() for card in deck_list.split('\n') if card.strip()]  # Assume que as cartas estão separadas por linhas
 
         deck = {}
@@ -133,6 +151,8 @@ def add_deck():
             'historic': 0
         }
 
+        basic_land_names = ['Forest', 'Island', 'Mountain', 'Plains', 'Swamp']
+
         for card_name in card_names:
             # Verifica se há um número no início do nome da carta
             if card_name[0].isdigit():
@@ -141,6 +161,10 @@ def add_deck():
                 quantity = int(quantity)
             else:
                 quantity = 1
+
+            # Ignora os terrenos básicos
+            if card_name in basic_land_names:
+                continue
 
             # Atualiza a quantidade correspondente da carta no deck
             if card_name in deck:
@@ -167,19 +191,20 @@ def add_deck():
             if card is not None:
                 card_name = card['name']
                 if card_name in deck:
-                    card['quantity'] = 1  # Definindo a quantidade como 1 para cada carta encontrada
+                    card['quantity'] = deck[card_name]  # Definindo a quantidade conforme a contagem no deck
 
                     # Atualiza a contagem de formatos
                     for format_name in card['formats']:
                         if format_name in format_counts:
-                            format_counts[format_name] += 1
+                            format_counts[format_name] += deck[card_name]
 
                     filtered_cards.append(card)
 
         # Renderização do template com as cartas e formato do deck
         return render_template('deck.html', deck_name=deck_name, deck_list=filtered_cards, format_counts=format_counts)
 
-    return render_template('add_deck.html')
+    return render_template('add_deck.html', deck_name=deck_name)
+
 
 def process_card(card_name):
     try:
@@ -206,7 +231,14 @@ def process_card(card_name):
     except (requests.exceptions.RequestException, json.JSONDecodeError):
         return None
 
-
+def process_deck_list(deck_list):
+    deck_cards = []
+    basic_land_names = ['Forest', 'Island', 'Mountain', 'Plains', 'Swamp']
+    for line in deck_list.splitlines():
+        card_name, card_quantity = line.strip().split()
+        if card_name not in basic_land_names:
+            deck_cards.append((card_name, int(card_quantity)))
+    return deck_cards
     
 
 
