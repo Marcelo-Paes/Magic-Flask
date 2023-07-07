@@ -168,7 +168,7 @@ def add_deck():
 
             # Atualiza a quantidade correspondente da carta no deck
             if card_name in deck:
-                deck[card_name] += quantity
+                card['quantity'] = 1  # Definindo a quantidade
             else:
                 deck[card_name] = quantity
 
@@ -196,7 +196,7 @@ def add_deck():
                     # Atualiza a contagem de formatos
                     for format_name in card['formats']:
                         if format_name in format_counts:
-                            format_counts[format_name] += deck[card_name]
+                            format_counts[format_name] += 1
 
                     filtered_cards.append(card)
 
