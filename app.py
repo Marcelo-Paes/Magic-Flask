@@ -168,7 +168,7 @@ def add_deck():
 
             # Atualiza a quantidade correspondente da carta no deck
             if card_name in deck:
-                card['quantity'] = 1  # Definindo a quantidade
+                deck[card_name] += quantity
             else:
                 deck[card_name] = quantity
 
