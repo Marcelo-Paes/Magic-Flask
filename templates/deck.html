@@ -4,141 +4,10 @@
     <title>Deck Info</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/tela_deck_final.css') }}">
    
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var cardNames = document.getElementsByClassName('card-name');
-            var cardImages = document.getElementsByClassName('card-image');
-            var decreaseButtons = document.getElementsByClassName('quantity-decrease');
-            var increaseButtons = document.getElementsByClassName('quantity-increase');
-            var quantityElements = document.getElementsByClassName('quantity');
-            var totalPriceElement = document.getElementById('total-price');
-            var cardPrices = document.getElementsByClassName('card-price');
-
-            function updateTotalPrice() {
-                var totalPrice = 0;
-
-                for (var i = 0; i < quantityElements.length; i++) {
-                    var price = parseFloat(cardPrices[i].getAttribute('data-price'));
-                    var quantity = parseInt(quantityElements[i].textContent);
-                    var subtotal = price * quantity;
-                    totalPrice += subtotal;
-                    cardPrices[i].textContent = subtotal.toFixed(2);
-                }
-
-                totalPriceElement.textContent = totalPrice.toFixed(2);
-            }
-
-            function positionCardImage(e, index) {
-                var cursorX = e.clientX;
-                var cursorY = e.clientY;
-                var cardImage = cardImages[index];
-
-                var cardWidth = cardImage.offsetWidth;
-                var cardHeight = cardImage.offsetHeight;
-
-                var windowWidth = window.innerWidth;
-                var windowHeight = window.innerHeight;
-
-                var left = cursorX + (-10);
-                var top = cursorY + (-10);
-
-                // Verificar limite direito da janela
-                if (left + cardWidth > windowWidth) {
-                    left = windowWidth - cardWidth;
-                }
-
-                // Verificar limite inferior da janela
-                if (top + cardHeight > windowHeight) {
-                    top = windowHeight - cardHeight;
-                }
-
-                cardImage.style.left = left + 'px';
-                cardImage.style.top = top + 'px';
-            }
-
-            for (var i = 0; i < cardNames.length; i++) {
-                (function(index) {
-                    cardNames[index].addEventListener('mousemove', function(e) {
-                        positionCardImage(e, index);
-                    });
-
-                    cardNames[index].addEventListener('mouseenter', function() {
-                        cardImages[index].style.display = 'block';
-                    });
-
-                    cardNames[index].addEventListener('mouseleave', function() {
-                        cardImages[index].style.display = 'none';
-                    });
-
-                    decreaseButtons[index].addEventListener('click', function() {
-                        var quantityElement = quantityElements[index];
-                        var quantity = parseInt(quantityElement.textContent);
-
-                        if (quantity > 1) {
-                            quantity--;
-                            quantityElement.textContent = quantity;
-                            updateTotalPrice();
-                        }
-                    });
-
-                    increaseButtons[index].addEventListener('click', function() {
-                        var quantityElement = quantityElements[index];
-                        var quantity = parseInt(quantityElement.textContent);
-
-                        quantity++;
-                        quantityElement.textContent = quantity;
-                        updateTotalPrice();
-                    });
-                })(i);
-            }
-
-            updateTotalPrice();
-        });
-        class MobileNavbar {
-  constructor(mobileMenu, navList, navLinks) {
-    this.mobileMenu = document.querySelector(mobileMenu);
-    this.navList = document.querySelector(navList);
-    this.navLinks = document.querySelectorAll(navLinks);
-    this.activeClass = "active";
-
-    this.handleClick = this.handleClick.bind(this);
-  }
-
-  animateLinks() {
-    this.navLinks.forEach((link, index) => {
-      link.style.animation
-        ? (link.style.animation = "")
-        : (link.style.animation = `navLinkFade 0.5s ease forwards ${
-            index / 7 + 0.3
-          }s`);
-    });
-  }
-
-  handleClick() {
-    this.navList.classList.toggle(this.activeClass);
-    this.mobileMenu.classList.toggle(this.activeClass);
-    this.animateLinks();
-  }
-
-  addClickEvent() {
-    this.mobileMenu.addEventListener("click", this.handleClick);
-  }
-
-  init() {
-    if (this.mobileMenu) {
-      this.addClickEvent();
-    }
-    return this;
-  }
-}
-
-const mobileNavbar = new MobileNavbar(
-  ".mobile-menu",
-  ".nav-list",
-  ".nav-list li",
-);
-mobileNavbar.init();
-    </script>
+    
+    <style>
+        
+    </style>
 </head>
 <body>
   <nav>
@@ -152,45 +21,158 @@ mobileNavbar.init();
         <li><a href="add_deck">Add Deck</a></li>
       </ul>
   </nav>
+  <container class="Decks_info">
     <div id="deckContent" class="deck-content">
         <div class="deck-list">
             <h1>Deck</h1>
             <h2>{{ deck_name }}</h2>
             <h3>Deck List:</h3>
 
-            <p>{% for card in deck_list %}</p>
             <div>
-                <button class="quantity-decrease">-</button>
-                <span class="quantity">{{ card.quantity }}</span>
-                <button class="quantity-increase">+</button>
-                <span class="card-name" title="{{ card.name }}">{{ card.name }}</span>
-                <span class="card-price" data-price="{{ card.price_brl }}"> - R$ <span>{{ card.price_brl }}</span></span><br>
-                <img class="card-image" src="{{ card.image }}" alt="{{ card.name }}"><br>
-            </div>
+            {% for card in deck_list %}
+                <div class="card-item">
+                   <!-- <button class="remove-card">X</button>-->
+                    <button class="quantity-decrease">-</button>
+                    <span class="quantity">{{ card.quantity }}</span>
+                    <button class="quantity-increase">+</button>
+                    <span class="card-name" title="{{ card.name }}">{{ card.name }}</span>
+                    <span class="card-price" data-price="{{ card.price_brl }}"> - R$ <span>{{ card.price_brl }}</span></span><br>
+                    
+                    <img class="card-image" src="{{ card.image }}" alt="{{ card.name }}">
+                </div>
             {% endfor %}
-
-            
+            </div>
         </div>
-        
+
+    </container>
+        <container class="Formatos_tudo">
         <div class="format-list">
             <h2>Formatos:</h2>
             
             <table>
-              
                 <tbody>
-                  
                     {% for format_name, count in format_counts.items() %}
                     <tr>
                         <td>Formato {{ format_name }}:</td>
                         <td>{{ count }} carta(s)</td>
                     </tr>
                     {% endfor %}
-                    
                 </tbody>
-               
             </table>
             <p>O seu deck possui {{ deck_list|length }} carta(s) diferentes</p>
             <p>Total do Deck List: R$ <span id="total-price"></span></p>
         </div>
+    </div>
+</container>
 </body>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+  var decreaseButtons = document.getElementsByClassName('quantity-decrease');
+  var increaseButtons = document.getElementsByClassName('quantity-increase');
+  var quantityElements = document.getElementsByClassName('quantity');
+  var totalPriceElement = document.getElementById('total-price');
+  var cardPrices = document.getElementsByClassName('card-price');
+  var cardNames = document.getElementsByClassName('card-name');
+  var cardImages = document.getElementsByClassName('card-image');
+
+  function updateTotalPrice() {
+    var totalPrice = 0;
+
+    for (var i = 0; i < quantityElements.length; i++) {
+      var price = parseFloat(cardPrices[i].getAttribute('data-price'));
+      var quantity = parseInt(quantityElements[i].textContent);
+      var subtotal = price * quantity;
+      totalPrice += subtotal;
+      cardPrices[i].textContent = subtotal.toFixed(2);
+    }
+
+    totalPriceElement.textContent = totalPrice.toFixed(2);
+  }
+
+  function removeCard(e) {
+    var cardItem = e.target.parentElement;
+    var cardIndex = Array.from(cardItem.parentElement.children).indexOf(cardItem);
+    cardItem.remove();
+    updateTotalPrice();
+
+    // Atualizar a lista de elementos cardImages
+    cardImages = document.getElementsByClassName('card-image');
+
+    // Verificar se o mouse está em cima de outra carta
+    var hoveredCardIndex = -1;
+
+    // Verificar se o mouse está em cima do nome da carta
+    var isHoveringCardName = false;
+    for (var i = 0; i < cardNames.length; i++) {
+      if (cardNames[i].matches(':hover')) {
+        hoveredCardIndex = i;
+        isHoveringCardName = true;
+        break;
+      }
+    }
+
+    if (isHoveringCardName) {
+      // Mostrar a imagem da carta em que o mouse está em cima
+      showCardImage(hoveredCardIndex);
+    } else {
+      // Se não houver carta em destaque, ocultar todas as imagens das cartas
+      hideAllCardImages();
+    }
+  }
+
+  function hideAllCardImages() {
+    for (var i = 0; i < cardImages.length; i++) {
+      cardImages[i].style.display = 'none';
+    }
+  }
+
+  function showCardImage(index) {
+    cardImages[index].style.display = 'block';
+  }
+
+  for (var i = 0; i < decreaseButtons.length; i++) {
+    decreaseButtons[i].addEventListener('click', function() {
+      var quantityElement = this.parentElement.querySelector('.quantity');
+      var quantity = parseInt(quantityElement.textContent);
+
+      if (quantity > 1) {
+        quantity--;
+        quantityElement.textContent = quantity;
+        updateTotalPrice();
+      }
+    });
+  }
+
+  for (var i = 0; i < increaseButtons.length; i++) {
+    increaseButtons[i].addEventListener('click', function() {
+      var quantityElement = this.parentElement.querySelector('.quantity');
+      var quantity = parseInt(quantityElement.textContent);
+
+      quantity++;
+      quantityElement.textContent = quantity;
+      updateTotalPrice();
+    });
+  }
+
+  for (var i = 0; i < cardNames.length; i++) {
+    (function(index) {
+      cardNames[index].addEventListener('mouseover', function() {
+        showCardImage(index);
+      });
+
+      cardNames[index].addEventListener('mouseout', function() {
+        hideAllCardImages();
+      });
+    })(i);
+  }
+
+  var removeButtons = document.getElementsByClassName('remove-card');
+  for (var i = 0; i < removeButtons.length; i++) {
+    removeButtons[i].addEventListener('click', removeCard);
+  }
+
+  updateTotalPrice();
+});
+
+    </script>
 </html>

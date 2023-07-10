@@ -16,11 +16,7 @@ body {
     height: 400px;
   }
   
-  .deck-content {
-    margin: 5px;
-    display: flex;
-    justify-content: space-between;
-  }
+  
   
   .deck-list {
     flex: 1;
@@ -61,6 +57,7 @@ body {
     border-radius: 3px;
     cursor: pointer;
     transition: background-color 0.3s ease; /* Adiciona uma transição suave */
+    margin: 2px;
   }
   
   .deck-list button:hover {
@@ -76,13 +73,7 @@ body {
     color: #ffffff; /* Cor de texto branca */
   }
   
-  .deck-list .card-image {
-    width: 400;
-    max-height: auto;
-    object-fit: cover;
-    border-radius: 5px;
-    margin-top: 10px;
-  }
+  
   
 .quantity{
     color: #ffffff;
@@ -173,18 +164,19 @@ body {
   
   /* Estilos da tabela */
 .format-list table {
-    width: 30%;
+    width: 300px;
     border-collapse: collapse; /* Remove as bordas internas da tabela */
+    
   }
 
   .format-list p {
     font-size: 16px;
     background-color: rgba(106, 83, 131, 0.8); /* Cor roxa */
-    padding: 10px;
+    padding: 5px;
     border: none; /* Remove as bordas internas das células */
     color: #efecec; /* Cor de texto branca */
     margin-bottom: 5px;
-    width: 28.5%;
+    width: 300px;
     height: auto;
    
   }
@@ -208,18 +200,38 @@ body {
     text-align: right;
   }
   
-  /* Estilos dos botões */
-  .container button {
-    padding: 10px 20px;
-    background-color: #7b579f; /* Cor roxa mais escura */
-    color: #ffffff; /* Cor de texto branca */
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease; /* Adiciona uma transição suave */
-  }
-  
-  .container button:hover {
-    background-color: #68468b; /* Cor roxa mais clara ao passar o mouse */
-  }
 
+  .card-image {
+    position: fixed;
+    left: 10%;
+    top: 10%;
+    display: none;
+    margin-left: 15%;
+    padding: 5px;
+    
+}
+.deck-content p{
+    padding: 10px;
+}
+
+.card-name:hover {
+  background-color: #7b579f;
+}
+
+.Formatos_tudo {
+  position: fixed;
+  margin-left: auto;
+  margin-right: auto;
+  margin-left: 750px;
+  display: flex;
+}
+
+.deck-content {
+  margin: 5px;
+  display: flex;
+  justify-content: space-between;
+  max-width:25%;
+}
+.remove-card button:hover{
+  background-color:#d72424;
+}

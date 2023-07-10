@@ -3,6 +3,28 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/tela_resultado.css') }}">
+    <style>
+       
+
+       .card-image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    z-index: 999;
+    width: auto;
+    height: 400px;
+  
+}
+
+
+        .container:hover .card-image-overlay {
+  opacity: 1;
+}
+
+
+    </style>
     <title>Search Result</title>
 </head>
 <body>
@@ -13,28 +35,35 @@
             <div class="bar"></div>
         </div>
         <ul class="menu">
-          <li><a href="/">Index</a></li>
-          <li><a href="add_deck">Add Deck</a></li>
+            <li><a href="/">Index</a></li>
+            <li><a href="add_deck">Add Deck</a></li>
         </ul>
     </nav>
     <h1>Search Result</h1>
     <form action="/search" method="POST">
-        
         <input type="text" id="card_name" name="card_name" required placeholder="New Card Name">
         <button type="submit">Search</button>
     </form>
     <div class="container">
+        {% if card_image_front %}
+        <div class="card-image-overlay">
+            <img class="card-image" src="{{ card_image_back }}" alt="{{ card_name }} (Back)">
+        </div>
+        <img class="card-image" src="{{ card_image_front }}" alt="{{ card_name }}">
+        {% else %}
         <img class="card-image" src="{{ card_image }}" alt="{{ card_name }}">
+        {% endif %}
+        
         <div class="card-info">
             <h2>{{ card_name }}</h2>
-            
             <p>
                 <span class="format-label">Formatos:</span>
                 {% for format in card_formats %}
                 {{ format }}{% if not loop.last %}, {% endif %}{% endfor %}
-              </p>
-            <p class="price">Price: {{ card_price_brl }} BRL</p>
-          </div>
+            </p>
+            <p class="price">Price: {{ card_price }} BRL</p>
+        </div>
+    </div>
     <script>
         const menuToggle = document.querySelector('.menu-toggle');
         const menu = document.querySelector('.menu');

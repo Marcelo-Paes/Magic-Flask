@@ -42,16 +42,33 @@ def search():
         return render_template('error.html', message='A carta não foi encontrada.')
     card_data = json.loads(response.text)
 
-    card_image = card_data['image_uris']['normal']
-    card_description = card_data['oracle_text']
-    card_price_usd = card_data['prices']['usd']
+    card_image = ''
+    card_image_front = ''
+    card_image_back = ''
+    card_price = 'N/A'
 
-    # Verificar se o preço em USD é None e atribuir 'N/A' como valor padrão
-    if card_price_usd is None:
-        card_price_usd = 'N/A'
-        card_price_brl = 'N/A'
-    else:
-        card_price_brl = convert_to_brl(float(card_price_usd))
+    # Verificar se a carta possui o atributo "image_uris" para cartas com uma face
+    if 'image_uris' in card_data:
+        card_image = card_data['image_uris'].get('normal')
+
+    # Verificar se a carta possui o atributo "card_faces" para cartas com duas faces
+    if 'card_faces' in card_data:
+        card_faces = card_data['card_faces']
+        if len(card_faces) == 2:
+            card_price_front = card_faces[0].get('prices', {}).get('usd')
+            card_price_back = card_faces[1].get('prices', {}).get('usd')
+            card_image_front = card_faces[0].get('image_uris', {}).get('normal')
+            card_image_back = card_faces[1].get('image_uris', {}).get('normal')
+
+            if card_price_front is not None:
+                card_price_front = convert_to_brl(float(card_price_front))
+            if card_price_back is not None:
+                card_price_back = convert_to_brl(float(card_price_back))
+
+    # Obter o preço da carta
+    card_price = card_data['prices'].get('usd')
+    if card_price is not None:
+        card_price = convert_to_brl(float(card_price))
 
     # Obter os formatos da carta
     card_formats = {}
@@ -63,18 +80,9 @@ def search():
     # Verificar se é um terreno básico
     basic_land_names = ['Forest', 'Island', 'Mountain', 'Plains', 'Swamp']
     if card_name in basic_land_names:
-        card_price_usd = 'N/A'
-        card_price_brl = 'N/A'
-        response = requests.get(f'https://api.scryfall.com/cards/named?exact={card_name}')
-        if response.status_code == 404:
-            # Carta básica não encontrada na API
-            return render_template('error.html', message='A carta básica não foi encontrada.')
-        card_data = json.loads(response.text)
-        card_image = card_data['image_uris']['normal']
+        card_price = 'N/A'
 
-    return render_template('result.html', card_name=card_name, card_image=card_image, card_description=card_description, card_price_usd=card_price_usd, card_price_brl=card_price_brl, card_formats=card_formats)
-
-
+    return render_template('result.html', card_name=card_name, card_price=card_price, card_image=card_image, card_image_front=card_image_front, card_image_back=card_image_back, card_formats=card_formats)
 # Rota de erro
 @app.route('/error')
 def error():
