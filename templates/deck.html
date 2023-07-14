@@ -158,9 +158,16 @@
 
             var deckName = document.querySelector('.Decks_info h2').textContent.trim();
             var filename = deckName.replace(/\s/g, '_') + '.txt';
+            
+            var totalPrice = parseFloat(totalPriceElement.textContent);
+            var deckTotal = `Total Value: R$ ${totalPrice.toFixed(2)}`;
+
+            var observation = 'Values taken and converted based on scryfall.';
+
+            var deckContent = deckList + '\n' + deckTotal + '\n\n' + observation;
 
             var element = document.createElement('a');
-            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(deckList));
+            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(deckContent));
             element.setAttribute('download', filename);
             element.style.display = 'none';
             document.body.appendChild(element);
