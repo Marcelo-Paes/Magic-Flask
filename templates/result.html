@@ -3,12 +3,6 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/tela_resultado.css') }}">
-    <style>
-       
-
-
-
-    </style>
     <title>Search Result</title>
 </head>
 <body>
@@ -25,9 +19,12 @@
     </nav>
     <h1>Search Result</h1>
     <form action="/search" method="POST">
-        <input type="text" id="card_name" name="card_name" required placeholder="New Card Name">
+        <div class="autocomplete-wrapper">
+          <input type="text" id="card_name" name="card_name" required placeholder="New Card Name">
+          <div class="autocomplete-list" id="autocomplete-list"></div>
+        </div>
         <button type="submit">Search</button>
-    </form>
+      </form>
     <div class="container">
         {% if card_image_front %}
         <div class="card-image-overlay">
@@ -51,10 +48,51 @@
     <script>
         const menuToggle = document.querySelector('.menu-toggle');
         const menu = document.querySelector('.menu');
-
+        const cardNameInput = document.getElementById('card_name');
+        const autocompleteList = document.getElementById('autocomplete-list');
+    
         menuToggle.addEventListener('click', () => {
-            menu.classList.toggle('show-menu');
+          menu.classList.toggle('show-menu');
         });
-    </script>
+    
+        cardNameInput.addEventListener('input', () => {
+          const inputValue = cardNameInput.value.trim();
+          autocompleteList.innerHTML = '';
+    
+          if (inputValue) {
+            fetch(`https://api.scryfall.com/cards/autocomplete?q=${inputValue}`)
+              .then(response => response.json())
+              .then(data => {
+                const options = data.data.slice(0, 5); // Limita a exibição a 5 opções
+    
+                options.forEach(item => {
+                  const option = document.createElement('div');
+                  option.classList.add('autocomplete-item');
+                  option.textContent = item;
+                  option.addEventListener('click', () => {
+                    cardNameInput.value = item;
+                    autocompleteList.innerHTML = '';
+                  });
+                  autocompleteList.appendChild(option);
+                });
+    
+                if (options.length === 0) {
+                  autocompleteList.innerHTML = '<div class="autocomplete-item">No results found</div>';
+                }
+              })
+              .catch(error => {
+                console.log('Error:', error);
+              });
+          }
+        });
+    
+        document.addEventListener('click', (event) => {
+          const targetElement = event.target;
+    
+          if (!targetElement.closest('.autocomplete-wrapper')) {
+            autocompleteList.innerHTML = '';
+          }
+        });
+      </script>
 </body>
 </html>

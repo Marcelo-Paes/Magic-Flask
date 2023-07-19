@@ -2,36 +2,82 @@
 <html>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/tela_inicio.css') }}">
-    <title>Search Magic Cards</title>
-    
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/tela_inicio.css') }}">
+  
+  <title>Search Magic Cards</title>
 </head>
 <body>
   <nav>
-      <div class="menu-toggle">
-          <div class="bar"></div>
-          <div class="bar"></div>
-          <div class="bar"></div>
-      </div>
-      <ul class="menu">
-        <li><a href="/">Index</a></li>
-        <li><a href="add_deck">Add Deck</a></li>
-      </ul>
+    <div class="menu-toggle">
+      <div class="bar"></div>
+      <div class="bar"></div>
+      <div class="bar"></div>
+    </div>
+    <ul class="menu">
+      <li><a href="/">Index</a></li>
+      <li><a href="add_deck">Add Deck</a></li>
+    </ul>
   </nav>
   <h1>Search Result</h1>
   <form action="/search" method="POST">
-      
+    <div class="autocomplete-wrapper">
       <input type="text" id="card_name" name="card_name" required placeholder="New Card Name">
-      <button type="submit">Search</button>
+      <div class="autocomplete-list" id="autocomplete-list"></div>
+    </div>
+    <button type="submit">Search</button>
   </form>
+
   <script>
     const menuToggle = document.querySelector('.menu-toggle');
     const menu = document.querySelector('.menu');
+    const cardNameInput = document.getElementById('card_name');
+    const autocompleteList = document.getElementById('autocomplete-list');
 
     menuToggle.addEventListener('click', () => {
-        menu.classList.toggle('show-menu');
+      menu.classList.toggle('show-menu');
     });
-</script>
 
+    cardNameInput.addEventListener('input', () => {
+      const inputValue = cardNameInput.value.trim();
+      autocompleteList.innerHTML = '';
+
+      if (inputValue) {
+        fetch(`https://api.scryfall.com/cards/autocomplete?q=${inputValue}`)
+          .then(response => response.json())
+          .then(data => {
+            const options = data.data.slice(0, 5); // Limita a exibição a 5 opções
+
+            options.forEach(item => {
+              const option = document.createElement('div');
+              option.classList.add('autocomplete-item');
+              option.textContent = item;
+              option.addEventListener('click', () => {
+                cardNameInput.value = item;
+                autocompleteList.innerHTML = '';
+              });
+              autocompleteList.appendChild(option);
+            });
+
+            if (options.length === 0) {
+              const noResults = document.createElement('div');
+              noResults.classList.add('autocomplete-item');
+              noResults.textContent = 'No results found';
+              autocompleteList.appendChild(noResults);
+            }
+          })
+          .catch(error => {
+            console.log('Error:', error);
+          });
+      }
+    });
+
+    document.addEventListener('click', (event) => {
+      const targetElement = event.target;
+
+      if (!targetElement.closest('.autocomplete-wrapper')) {
+        autocompleteList.innerHTML = '';
+      }
+    });
+  </script>
 </body>
 </html>
