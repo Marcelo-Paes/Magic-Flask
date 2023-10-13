@@ -149,4 +149,28 @@ nav {
     cursor: pointer;
   }
   
-  
+  .fixed-table {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 300px;
+    background-color: white;
+    z-index: 999; /* Para garantir que fique acima do conteúdo rolável */
+    display: none;
+    overflow-y: auto;
+}
+
+.fixed-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.fixed-table th, .fixed-table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: left;
+}
+
+.fixed-table tbody tr:hover {
+    background-color: #f5f5f5;
+}

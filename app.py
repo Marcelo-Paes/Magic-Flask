@@ -1,10 +1,10 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request,jsonify
 import requests
 import json
 import os
 from cachetools import TTLCache
 from concurrent.futures import ThreadPoolExecutor
-from math import ceil
+import requests
 os.environ['EXCHANGERATE_API_KEY'] = 'sua_chave_de_api'
 app = Flask(__name__)
 
@@ -128,15 +128,37 @@ def process_card(card_name):
         response = requests.get(f'https://api.scryfall.com/cards/named?exact={card_name.strip().replace(" ", "+")}')
         card_data = json.loads(response.text)
         card_image = card_data.get('image_uris', {}).get('normal')
-        if card_image:
-            card_name = card_data.get('name')
-            card_price_usd = card_data.get('prices', {}).get('usd')
-            card_price_brl = convert_to_brl(card_price_usd)
-            return {'name': card_name, 'image': card_image, 'price_brl': card_price_brl}
-        else:
-            return None
+        card_image_back = None
+        card_price_usd = card_data.get('prices', {}).get('usd')
+        card_price_brl = convert_to_brl(card_price_usd)
+
+        if 'card_faces' in card_data:
+            card_faces = card_data['card_faces']
+            if len(card_faces) == 2:
+                card_image_back = card_faces[1].get('image_uris', {}).get('normal')
+
+        card_name = card_data.get('name')
+
+        # Obter os formatos válidos da carta
+        valid_formats = []
+        legalities = card_data.get('legalities', {})
+        for format_name, legality in legalities.items():
+            if legality == 'legal':
+                valid_formats.append(format_name)
+
+        card = {
+            'name': card_name,
+            'image': card_image,
+            'image_back': card_image_back,
+            'price_brl': card_price_brl,
+            'formats': valid_formats
+        }
+
+        return card
     except (requests.exceptions.RequestException, json.JSONDecodeError):
         return None
+
+
 
 @app.route('/add_deck', methods=['GET', 'POST'])
 def add_deck():
@@ -219,25 +241,38 @@ def process_card(card_name):
         response = requests.get(f'https://api.scryfall.com/cards/named?exact={card_name.strip().replace(" ", "+")}')
         card_data = json.loads(response.text)
         card_image = card_data.get('image_uris', {}).get('normal')
-        if card_image:
-            card_name = card_data.get('name')
-            card_price_usd = card_data.get('prices', {}).get('usd')
-            card_price_brl = convert_to_brl(card_price_usd)
+        card_image_back = None
+        card_price_usd = card_data.get('prices', {}).get('usd')
+        card_price_brl = convert_to_brl(card_price_usd)
 
-            # Obter os formatos válidos da carta
-            valid_formats = []
-            legalities = card_data.get('legalities', {})
-            for format_name, legality in legalities.items():
-                if legality == 'legal':
+        card_name = card_data.get('name')
+
+        # Obter os formatos válidos da carta
+        valid_formats = []
+        legalities = card_data.get('legalities', {})
+        for format_name, legality in legalities.items():
+            if legality == 'legal':
+                # Adicione a verificação para evitar formatos específicos
+                if format_name not in ['gladiator', 'oathbreaker', 'duel','penny','predh','paupercommander','premodern']:
                     valid_formats.append(format_name)
 
-            #print("Formatos válidos da carta:", valid_formats)
+        if 'card_faces' in card_data:
+            card_faces = card_data['card_faces']
+            if len(card_faces) == 2:
+                card_image_back = card_faces[1].get('image_uris', {}).get('normal')
 
-            return {'name': card_name, 'image': card_image, 'price_brl': card_price_brl, 'formats': valid_formats}
-        else:
-            return None
+        card = {
+            'name': card_name,
+            'image': card_image,
+            'image_back': card_image_back,
+            'price_brl': card_price_brl,
+            'formats': valid_formats
+        }
+
+        return card
     except (requests.exceptions.RequestException, json.JSONDecodeError):
         return None
+
 
 def process_deck_list(deck_list):
     deck_cards = []
@@ -247,8 +282,35 @@ def process_deck_list(deck_list):
         if card_name not in basic_land_names:
             deck_cards.append((card_name, int(card_quantity)))
     return deck_cards
+def get_card_info(card_name):
+    try:
+        response = requests.get(f'https://api.scryfall.com/cards/named?fuzzy={card_name}')
+        if response.status_code == 200:
+            card_data = response.json()
+            print("Dados da carta:", card_data)  # Adicione esta linha para imprimir os dados obtidos
+            return card_data
+        else:
+            print("Erro: Carta não encontrada")  # Adicione esta linha para imprimir um erro
+            return None  # Carta não encontrada
+    except requests.exceptions.RequestException:
+        print("Erro na solicitação")  # Adicione esta linha para imprimir um erro
+        return None  # Erro na solicitação
+@app.route('/card_format/<card_name>', methods=['GET'])
+def card_format(card_name):
+    print(f'Servidor Flask: Rota chamada para a carta {card_name}')
+    card_info = get_card_info(card_name)
     
-
-
+    if card_info is not None:
+        # Verifique se a carta tem informações sobre formatos
+        if 'legalities' in card_info:
+            format_info = card_info['legalities']
+            # Supondo que você queira o formato "standard", mas você pode personalizar conforme necessário
+            format_name = format_info.get('standard', 'N/A')
+            return jsonify({'formatInfo': {'format': format_name}})
+        else:
+            return jsonify({'formatInfo': 'Informações de formato não disponíveis para esta carta.'})
+    else:
+        return jsonify({'formatInfo': 'Carta não encontrada.'})
+    
 if __name__ == '__main__':
     app.run()

@@ -40,6 +40,8 @@
         <p>Carregando Deck, Aguarde...</p>
         
     </div>
+    <div id="card_info">dasdasdsa</div>
+    
 
     <script>
         function showLoader() {
@@ -64,6 +66,37 @@
         menuToggle.addEventListener('click', () => {
             menu.classList.toggle('show-menu');
         });
+
+        document.addEventListener('DOMContentLoaded', function () {
+        const cardList = document.getElementById('card_list'); // Supondo que você tenha um elemento com o id 'card_list' que contém a lista de cartas
+
+        cardList.addEventListener('mouseover', function (e) {
+            if (e.target.tagName === 'TD') {
+                const cardName = e.target.textContent;
+
+                // Faça uma solicitação AJAX para obter informações da carta
+                fetch(`/card_format/${cardName}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const cardInfoElement = document.getElementById('card_info');
+
+                        if (data.error) {
+                            cardInfoElement.textContent = data.error;
+                        } else {
+                            cardInfoElement.textContent = `Formatos: ${Object.keys(data.formatInfo).join(', ')}`;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erro ao obter informações da carta:', error);
+                    });
+            }
+        });
+
+        cardList.addEventListener('mouseleave', function () {
+            const cardInfoElement = document.getElementById('card_info');
+            cardInfoElement.textContent = '';
+        });
+    });
     
     </script>
 </body>

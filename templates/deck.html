@@ -8,172 +8,215 @@
     </style>
 </head>
 <body>
-  <nav>
-      <div class="menu-toggle">
-          <div class="bar"></div>
-          <div class="bar"></div>
-          <div class="bar"></div>
-      </div>
-      <ul class="menu">
-        <li><a href="/">Index</a></li>
-        <li><a href="add_deck">Add Deck</a></li>
-      </ul>
-  </nav>
-  <container class="Decks_info">
-    <div id="deckContent" class="deck-content">
-        <div class="deck-list">
-            <h1>Deck</h1>
-            <h2>{{ deck_name }}</h2>
-            <h3>Deck List:</h3>
+    <nav>
+        <div class="menu-toggle">
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+        </div>
+        <ul class="menu">
+          <li><a href="/">Index</a></li>
+          <li><a href="add_deck">Add Deck</a></li>
+        </ul>
+    </nav>
+    <container class="Decks_info">
+      <div id="deckContent" class="deck-content">
+          <div class="deck-list">
+              <h1>Deck</h1>
+              <h2>{{ deck_name }}</h2>
+              <h3>Deck List:</h3>
+  
+              <div>
+                {% for card in deck_list %}
+                    <div class="card-item">
+                        <button class="quantity-decrease">-</button>
+                        <span class="quantity">{{ card.quantity }}</span>
+                        <button class="quantity-increase">+</button>
+                        <span class="card-name" title="{{ card.name }}">{{ card.name }}</span>
+                        <span class="card-price" data-price="{{ card.price_brl }}"> - R$ <span>{{ card.price_brl if card.price_brl != 'N/A' else '0.00' }}</span></span><br>
 
-            <div>
-            {% for card in deck_list %}
-                <div class="card-item">
-                    <button class="quantity-decrease">-</button>
-                    <span class="quantity">{{ card.quantity }}</span>
-                    <button class="quantity-increase">+</button>
-                    <span class="card-name" title="{{ card.name }}">{{ card.name }}</span>
-                    <span class="card-price" data-price="{{ card.price_brl }}"> - R$ <span>{{ card.price_brl }}</span></span><br>
-                    <img class="card-image" src="{{ card.image }}" alt="{{ card.name }}">
-                </div>
-            {% endfor %}
+                        {% if card.image_back %}
+                            <img class="card-image" src="{{ card.image }}" alt="{{ card.name }}">
+                            <img class="card-image-back" src="{{ card.image_back }}" alt="{{ card.name }} (Back)">
+                        {% else %}
+                            <img class="card-image" src="{{ card.image }}" alt="{{ card.name }}">
+                        {% endif %}
+                        <ul class="format-list">
+                            <li>Formatos:
+                                {% for format in card.formats %}
+                                    <span>{{ format }}{% if not loop.last %}, {% endif %}</span>
+                                {% endfor %}
+                            </li>
+                        </ul>
+                        
+                    </div>
+                {% endfor %}
             </div>
-        </div>
-    </container>
-    <container class="Formatos_tudo">
-        <div class="format-list">
-            <h2>Formatos:</h2>
-            <table>
-                <tbody>
-                    {% for format_name, count in format_counts.items() %}
-                    <tr>
-                        <td>Formato {{ format_name }}:</td>
-                        <td>{{ count }} carta(s)</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            <p>O seu deck possui {{ deck_list|length }} carta(s) diferentes</p>
-            <p>Total do Deck List: R$ <span id="total-price">0.00</span></p>
-            <button id="download-button">Download Deck List</button>
-        </div>
-    </div>
-</container>
-</body>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var decreaseButtons = document.getElementsByClassName('quantity-decrease');
-        var increaseButtons = document.getElementsByClassName('quantity-increase');
-        var quantityElements = document.getElementsByClassName('quantity');
-        var totalPriceElement = document.getElementById('total-price');
-        var cardPrices = document.getElementsByClassName('card-price');
-        var cardNames = document.getElementsByClassName('card-name');
-        var cardImages = document.getElementsByClassName('card-image');
-
-        function updateTotalPrice() {
-            var totalPrice = 0;
-
-            for (var i = 0; i < quantityElements.length; i++) {
-                var price = parseFloat(cardPrices[i].getAttribute('data-price'));
-                var quantity = parseInt(quantityElements[i].textContent);
-                var subtotal = price * quantity;
-                totalPrice += subtotal;
-                cardPrices[i].textContent = subtotal.toFixed(2);
-            }
-
-            totalPriceElement.textContent = totalPrice.toFixed(2);
-        }
-
-        function removeCard(e) {
-            var cardItem = e.target.parentElement;
-            cardItem.remove();
-            updateTotalPrice();
-        }
-
-        function hideAllCardImages() {
-            for (var i = 0; i < cardImages.length; i++) {
-                cardImages[i].style.display = 'none';
-            }
-        }
-
-        function showCardImage(index) {
-            cardImages[index].style.display = 'block';
-        }
-
-        for (var i = 0; i < decreaseButtons.length; i++) {
-            decreaseButtons[i].addEventListener('click', function() {
-                var quantityElement = this.parentElement.querySelector('.quantity');
-                var quantity = parseInt(quantityElement.textContent);
-
-                if (quantity > 1) {
-                    quantity--;
-                    quantityElement.textContent = quantity;
-                    updateTotalPrice();
-                }
-            });
-        }
-
-        for (var i = 0; i < increaseButtons.length; i++) {
-            increaseButtons[i].addEventListener('click', function() {
-                var quantityElement = this.parentElement.querySelector('.quantity');
-                var quantity = parseInt(quantityElement.textContent);
-
-                quantity++;
-                quantityElement.textContent = quantity;
-                updateTotalPrice();
-            });
-        }
-
-        for (var i = 0; i < cardNames.length; i++) {
-            (function(index) {
-                cardNames[index].addEventListener('mouseover', function() {
-                    showCardImage(index);
-                });
-
-                cardNames[index].addEventListener('mouseout', function() {
-                    hideAllCardImages();
-                });
-            })(i);
-        }
-
-        var removeButtons = document.getElementsByClassName('remove-card');
-        for (var i = 0; i < removeButtons.length; i++) {
-            removeButtons[i].addEventListener('click', removeCard);
-        }
-
-        updateTotalPrice();
-
-        var downloadButton = document.getElementById('download-button');
-        downloadButton.addEventListener('click', function() {
-            var deckList = '';
-
-            for (var i = 0; i < cardNames.length; i++) {
-                var cardName = cardNames[i].textContent;
-                var quantity = parseInt(quantityElements[i].textContent);
-                var price = parseFloat(cardPrices[i].getAttribute('data-price'));
-                var subtotal = price * quantity;
-
-                deckList += `${quantity}x ${cardName} - R$ ${subtotal.toFixed(2)}\n`;
-            }
-
-            var deckName = document.querySelector('.Decks_info h2').textContent.trim();
-            var filename = deckName.replace(/\s/g, '_') + '.txt';
             
-            var totalPrice = parseFloat(totalPriceElement.textContent);
-            var deckTotal = `Total Value: R$ ${totalPrice.toFixed(2)}`;
-
-            var observation = 'Values taken and converted based on scryfall.';
-
-            var deckContent = deckList + '\n' + deckTotal + '\n\n' + observation;
-
-            var element = document.createElement('a');
-            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(deckContent));
-            element.setAttribute('download', filename);
-            element.style.display = 'none';
-            document.body.appendChild(element);
-            element.click();
-            document.body.removeChild(element);
-        });
-    });
-</script>
+            
+      </container>
+      <container class="Formatos_tudo">
+          <div class="format-list">
+              <h2>Formatos:</h2>
+              <table>
+                  <tbody>
+                      {% for format_name, count in format_counts.items() %}
+                      <tr>
+                          <td>Formato {{ format_name }}:</td>
+                          <td>{{ count }} carta(s)</td>
+                      </tr>
+                      {% endfor %}
+                  </tbody>
+              </table>
+              <p>O seu deck possui {{ deck_list|length }} carta(s) diferentes</p>
+              <p>Total do Deck List: R$ <span id="total-price">0.00</span></p>
+              <button id="download-button">Download Deck List</button>
+          </div>
+          
+      </div>
+      <div id="format-info">
+          Formato: <span id="format-name"></span>
+      </div>
+  </container>
+  </body>
+  <script>
+      document.addEventListener('DOMContentLoaded', function() {
+          var decreaseButtons = document.getElementsByClassName('quantity-decrease');
+          var increaseButtons = document.getElementsByClassName('quantity-increase');
+          var quantityElements = document.getElementsByClassName('quantity');
+          var totalPriceElement = document.getElementById('total-price');
+          var cardPrices = document.getElementsByClassName('card-price');
+          var cardNames = document.getElementsByClassName('card-name');
+          var cardImages = document.getElementsByClassName('card-image');
+  
+          function updateTotalPrice() {
+              var totalPrice = 0;
+  
+              for (var i = 0; i < quantityElements.length; i++) {
+                  var price = cardPrices[i].getAttribute('data-price');
+                  if (price !== 'N/A') {
+                      // Converta o preço para um número e calcule o subtotal
+                      price = parseFloat(price);
+                      var quantity = parseInt(quantityElements[i].textContent);
+                      var subtotal = price * quantity;
+                      totalPrice += subtotal;
+                      cardPrices[i].textContent = subtotal.toFixed(2);
+                  } else {
+                      cardPrices[i].textContent = '0.00';  // Defina como '0.00' se o preço for 'N/A'
+                  }
+              }
+  
+              totalPriceElement.textContent = totalPrice.toFixed(2);
+          }
+  
+          function removeCard(e) {
+              var cardItem = e.target.parentElement;
+              cardItem.remove();
+              updateTotalPrice();
+          }
+  
+          function hideAllCardImages() {
+              for (var i = 0; i < cardImages.length; i++) {
+                  cardImages[i].style.display = 'none';
+              }
+          }
+  
+          function showCardImage(index) {
+              cardImages[index].style.display = 'block';
+          }
+  
+          for (var i = 0; i < decreaseButtons.length; i++) {
+              decreaseButtons[i].addEventListener('click', function() {
+                  var quantityElement = this.parentElement.querySelector('.quantity');
+                  var quantity = parseInt(quantityElement.textContent);
+  
+                  if (quantity > 1) {
+                      quantity--;
+                      quantityElement.textContent = quantity;
+                      updateTotalPrice();
+                  }
+              });
+          }
+  
+          for (var i = 0; i < increaseButtons.length; i++) {
+              increaseButtons[i].addEventListener('click', function() {
+                  var quantityElement = this.parentElement.querySelector('.quantity');
+                  var quantity = parseInt(quantityElement.textContent);
+  
+                  quantity++;
+                  quantityElement.textContent = quantity;
+                  updateTotalPrice();
+              });
+          }
+  
+          for (var i = 0; i < cardNames.length; i++) {
+              (function(index) {
+                  cardNames[index].addEventListener('mouseover', function() {
+                      showCardImage(index);
+                  });
+  
+                  cardNames[index].addEventListener('mouseout', function() {
+                      hideAllCardImages();
+                  });
+              })(i);
+          }
+  
+          var removeButtons = document.getElementsByClassName('remove-card');
+          for (var i = 0; i < removeButtons.length; i++) {
+              removeButtons[i].addEventListener('click', removeCard);
+          }
+  
+          updateTotalPrice();
+  
+          var downloadButton = document.getElementById('download-button');
+          downloadButton.addEventListener('click', function() {
+              var deckList = '';
+  
+              for (var i = 0; i < cardNames.length; i++) {
+                  var cardName = cardNames[i].textContent;
+                  var quantity = parseInt(quantityElements[i].textContent);
+                  var price = parseFloat(cardPrices[i].getAttribute('data-price'));
+                  var subtotal = price * quantity;
+  
+                  deckList += `${quantity}x ${cardName} - R$ ${subtotal.toFixed(2)}\n`;
+              }
+  
+              var deckName = document.querySelector('.Decks_info h2').textContent.trim();
+              var filename = deckName.replace(/\s/g, '_') + '.txt';
+              
+              var totalPrice = parseFloat(totalPriceElement.textContent);
+              var deckTotal = `Total Value: R$ ${totalPrice.toFixed(2)}`;
+  
+              var observation = 'Values taken and converted based on scryfall.';
+  
+              var deckContent = deckList + '\n' + deckTotal + '\n\n' + observation;
+  
+              var element = document.createElement('a');
+              element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(deckContent));
+              element.setAttribute('download', filename);
+              element.style.display = 'none';
+              document.body.appendChild(element);
+              element.click();
+              document.body.removeChild(element);
+          });
+      });
+  
+      $(document).ready(function () {
+          var cardName = "Nome da Carta";  // Substitua pelo nome da carta que está sendo exibida
+          console.log(`Nome da carta: ${cardName}`);  // Adicione esta linha
+  
+          $.get(`/card_format/${cardName}`, function (data) {
+              console.log(data); 
+              if ('formatInfo' in data) {
+                  var formatInfo = data.formatInfo;
+                  var formatName = formatInfo['format'];
+                  // Atualize o elemento HTML com as informações do formato
+                  $("#format-name").text(formatName);
+              } else {
+                  // Se não houver informações de formato disponíveis
+                  $("#format-info").text("Formato: N/A");
+              }
+          });
+      });
+  </script>
 </html>

@@ -180,6 +180,18 @@ body {
     height: auto;
    
   }
+
+  .format-list li {
+    font-size: 16px;
+    background-color: rgba(106, 83, 131, 0.8); /* Cor roxa */
+    padding: 5px;
+    border: none; /* Remove as bordas internas das células */
+    color: #efecec; /* Cor de texto branca */
+    margin-top: -30px;
+    width: 300px;
+    height: auto;
+   
+  }
   
   .format-list td {
     font-size: 16px;
@@ -219,11 +231,11 @@ body {
 }
 
 .Formatos_tudo {
-  position: fixed;
-  margin-left: auto;
-  margin-right: auto;
-  margin-left: 750px;
-  display: flex;
+  position: absolute;
+  top: 40px; /* Defina a posição superior desejada em relação à janela */
+  right: 10px; /* Defina a posição direita desejada em relação à janela */
+  max-height: 80vh;
+  overflow-y: auto;
 }
 
 .deck-content {
@@ -234,4 +246,31 @@ body {
 }
 .remove-card button:hover{
   background-color:#d72424;
+}
+.fixed-table {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 300px; /* Largura desejada */
+  background-color: white;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+  display: none; /* Inicialmente, oculte a tabela */
+  overflow-y: auto;
+}
+
+#card-info-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+#card-info-table th, #card-info-table td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: left;
+}
+.format-badge {
+  margin-right: 5px; /* Adicione margem entre os formatos */
+}
+#card-info-table tbody tr:hover {
+  background-color: #f5f5f5;
 }
