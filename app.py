@@ -1,11 +1,10 @@
 from flask import Flask, render_template, request,jsonify
 import requests
 import json
-import os
 from cachetools import TTLCache
 from concurrent.futures import ThreadPoolExecutor
 import requests
-os.environ['EXCHANGERATE_API_KEY'] = 'sua_chave_de_api'
+
 app = Flask(__name__)
 
 # Cache com tempo de vida de 1 hora (3600 segundos)
