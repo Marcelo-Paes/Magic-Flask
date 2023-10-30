@@ -6,7 +6,6 @@ from concurrent.futures import ThreadPoolExecutor
 import requests
 
 app = Flask(__name__)
-
 # Cache com tempo de vida de 1 hora (3600 segundos)
 cache = TTLCache(maxsize=1000, ttl=3600)
 
